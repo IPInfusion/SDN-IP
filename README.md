@@ -16,6 +16,7 @@ This contains of BGP protocol module supporting REST APIs whcih can be working w
    The bgp binary with REST API extention will be created in BGP_SDN/platform/linux/bin.
    
 ## Specification
+
 BGP supports the following REST APIs.
 
 1. POST/DELETE method for routing update to ONOS
@@ -52,7 +53,9 @@ BGP supports the following REST APIs.
      "router-id" : <string> (i.e., 10.0.0.1)
    }
    ```
+
 ### Configuration
+
   User needs to log in BGP in order to configure BGP protocol.
   ```sh
   # telnet localhost 2605
@@ -68,6 +71,7 @@ BGP supports the following REST APIs.
   bgpd(config-router)# bgp rest-server <Local Address> <Local Port>
   ```
 ### License
+    <To be filled>
     
 ### Acknowledge
   HTTP Server library named as libonion which is licensed under LGPLv3 and AGPLv3 licenses is used for HTTP Server interface in BGP. 
