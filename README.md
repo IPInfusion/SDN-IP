@@ -29,6 +29,7 @@ BGP supports the following REST APIs.
    This method is invoked when BGP instance is created. BGP sends out the following message to ONOS.
    ```sh
    http://<Address>:<Port>/wm/bgp/<Router-id>/<Capability>
+   ```
 
 3. POST/DELETE methods for installing/uninstalling a routing entry from ONOS
    These methods are used in order for ONOS to install/uninstall the routing entry to BGP. The following message must be sent out to BGP.
@@ -41,7 +42,9 @@ BGP supports the following REST APIs.
    ```sh
    http://<Address>:<Port>/wm/bgp/<Router-ID>/json
    ```
+
    The following is JSON format provided by BGP.
+
    ```sh
    {
      "rib" : [
@@ -57,6 +60,7 @@ BGP supports the following REST APIs.
 ### Configuration
 
   User needs to log in BGP in order to configure BGP protocol.
+
   ```sh
   # telnet localhost 2605
   bgpd> enable
@@ -65,6 +69,7 @@ BGP supports the following REST APIs.
   ```
 
   In order to configure REST interface in BGP, the following command needs to be configured.
+
   ```sh
   bgpd(config)# router bgp <AS-Number>
   bgpd(config-router)# bgp sdn-engine <1-2> <ONOS Address> <ONOS Port>
