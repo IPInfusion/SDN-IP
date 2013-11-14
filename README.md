@@ -70,8 +70,9 @@ BGP supports the following REST APIs.
   bgpd(config-router)# bgp sdn-engine <1-2> <ONOS Address> <ONOS Port>
   bgpd(config-router)# bgp rest-server <Local Address> <Local Port>
   ```
+  
 ### License
-    <To be filled>
+    To be filled
     
 ### Acknowledge
   HTTP Server library named as libonion which is licensed under LGPLv3 and AGPLv3 licenses is used for HTTP Server interface in BGP. 
