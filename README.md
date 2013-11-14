@@ -52,7 +52,21 @@ BGP supports the following REST APIs.
      "router-id" : <string> (i.e., 10.0.0.1)
    }
    ```
+### Configuration
+  User needs to log in BGP in order to configure BGP protocol.
+  ```sh
+  # telnet localhost 2605
+  bgpd> enable
+  bgpd# configuration terminal
+  bgpd(config)#
+  ```
 
+  In order to configure REST interface in BGP, the following command needs to be configured.
+  ```sh
+  bgpd(config)# router bgp <AS-Number>
+  bgpd(config-bgp)# bgp sdn-engine <1-2> <ONOS Address> <ONOS Port>
+  bgpd(config-bgp)# bgp rest-server <Local Address> <Local Port>
+  ```
 ### License
     
 ### Acknowledge
