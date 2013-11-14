@@ -64,8 +64,8 @@ BGP supports the following REST APIs.
   In order to configure REST interface in BGP, the following command needs to be configured.
   ```sh
   bgpd(config)# router bgp <AS-Number>
-  bgpd(config-bgp)# bgp sdn-engine <1-2> <ONOS Address> <ONOS Port>
-  bgpd(config-bgp)# bgp rest-server <Local Address> <Local Port>
+  bgpd(config-router)# bgp sdn-engine <1-2> <ONOS Address> <ONOS Port>
+  bgpd(config-router)# bgp rest-server <Local Address> <Local Port>
   ```
 ### License
     
