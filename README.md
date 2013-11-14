@@ -57,7 +57,7 @@ BGP supports the following REST APIs.
    }
    ```
 
-### Configuration
+## Configuration
 
   User needs to log in BGP in order to configure BGP protocol.
 
@@ -76,9 +76,9 @@ BGP supports the following REST APIs.
   bgpd(config-router)# bgp rest-server <Local Address> <Local Port>
   ```
   
-### License
+## License
     To be filled
     
-### Acknowledge
+## Acknowledge
   HTTP Server library named as libonion which is licensed under LGPLv3 and AGPLv3 licenses is used for HTTP Server interface in BGP. 
   
