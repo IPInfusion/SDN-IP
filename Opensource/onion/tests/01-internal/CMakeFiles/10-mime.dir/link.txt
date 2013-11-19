@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/10-mime.dir/10-mime.c.o  -o 10-mime -rdynamic ../../src/onion/libonion.so -lgnutls -lgcrypt -lpthread -lrt -Wl,-rpath,/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/onion 

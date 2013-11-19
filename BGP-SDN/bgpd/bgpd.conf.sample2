@@ -1,0 +1,72 @@
+!
+! BGP-SDN configuration saved from vty
+!   1999/10/24 23:23:27
+!
+hostname bgpd
+!password bgpsdn
+!enable password bgpsdn
+log file bgpd.log
+log stdout
+!
+router bgp 7675
+ipv6 bgp network 3ffe:506::/32
+ipv6 bgp network 3ffe:1800:e800::/40
+ipv6 bgp redistribute connected
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 remote-as 2500
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 interface sit5
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 description WIDE
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 send-community
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 distribute-list nla1 out
+ipv6 bgp neighbor fe80::2e0:18ff:fe98:2725 route-map set-nexthop out
+ipv6 bgp neighbor fe80::290:27ff:fe51:84c7 remote-as 4691
+ipv6 bgp neighbor fe80::290:27ff:fe51:84c7 interface sit7
+ipv6 bgp neighbor fe80::290:27ff:fe51:84c7 description DTI
+ipv6 bgp neighbor fe80::290:27ff:fe51:84c7 route-map set-nexthop out
+ipv6 bgp neighbor fe80::200:c0ff:fe30:9be3 remote-as 9377
+ipv6 bgp neighbor fe80::200:c0ff:fe30:9be3 interface sit3
+ipv6 bgp neighbor fe80::200:c0ff:fe30:9be3 route-map set-nexthop out
+ipv6 bgp neighbor fe80::200:c0ff:fe30:9be3 timers holdtime 240
+ipv6 bgp neighbor 3ffe:XXXX remote-as 1
+ipv6 bgp neighbor 3ffe:XXXX description XXXX
+ipv6 bgp neighbor 3ffe:XXXX next-hop-self
+ipv6 bgp neighbor 3ffe:XXXX distribute-list ntt-nla1 out
+ipv6 bgp neighbor 3ffe:XXXX route-map set-link-local out
+ipv6 bgp neighbor 3ffe:506:1000::2 remote-as 7675
+ipv6 bgp neighbor 3ffe:506:1000::2 next-hop-self
+ipv6 bgp neighbor fe80::210:5aff:fe6b:3cee remote-as 7675
+ipv6 bgp neighbor fe80::210:5aff:fe6b:3cee interface eth0
+ipv6 bgp neighbor fe80::2e0:18ff:fea8:bf5 remote-as 65000
+ipv6 bgp neighbor fe80::2e0:18ff:fea8:bf5 interface sit6
+ipv6 bgp neighbor fe80::2e0:18ff:fea8:bf5 route-map set-nexthop out
+ipv6 bgp neighbor fe80::2a0:c9ff:fec8:82ec remote-as 7530
+ipv6 bgp neighbor fe80::2a0:c9ff:fec8:82ec interface sit8
+ipv6 bgp neighbor fe80::2a0:c9ff:fec8:82ec description IRI 
+ipv6 bgp neighbor fe80::2a0:c9ff:fec8:82ec route-map set-nexthop out
+!
+ipv6 prefix-list 6bone-filter seq 5 permit 3ffe::/17 le 24 ge 24
+ipv6 prefix-list 6bone-filter seq 10 permit 3ffe:8000::/17 le 28 ge 28
+ipv6 prefix-list 6bone-filter seq 12 deny 3ffe::/16
+ipv6 prefix-list 6bone-filter seq 15 permit 2000::/3 le 16 ge 16
+ipv6 prefix-list 6bone-filter seq 20 permit 2001::/16 le 35 ge 35
+!
+ipv6 access-list all permit any
+ipv6 access-list nla1 deny 3ffe:506::/33
+ipv6 access-list nla1 permit 3ffe:506::/32
+ipv6 access-list nla1 deny any
+ipv6 access-list ntt-nla1 permit 3ffe:1800:0:ffff::c/127
+ipv6 access-list ntt-nla1 deny 3ffe:1800:e800::/41
+ipv6 access-list ntt-nla1 permit 3ffe:1800:e800::/40
+ipv6 access-list ntt-nla1 deny any
+!
+route-map set-nexthop permit 10
+ match ipv6 address all
+ set ipv6 next-hop global 3ffe:506::1
+ set ipv6 next-hop local fe80::cbb5:591a
+ set ip next-hop 203.181.89.26
+ set community 7675:0
+!
+route-map set-link-local permit 10
+ match ipv6 address all
+ set ipv6 next-hop local fe80::cbb5:591a
+ set ipv6 next-hop global 3ffe:1800:0:ffff::d
+!

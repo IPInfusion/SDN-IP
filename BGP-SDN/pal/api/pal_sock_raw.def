@@ -1,0 +1,537 @@
+/* Copyright (C) 2013 IP Infusion, Inc. All Rights Reserved. */
+
+#ifndef _PAL_SOCK_RAW_DEF
+#define _PAL_SOCK_RAW_DEF
+
+/* IP TOS bitmap */
+enum pal_iptos
+{
+   PAL_IPTOS_PREC_INTERNETCONTROL   =   (1 << 0)
+   /* Currently only this is used. Can add others if used. */
+};
+
+/* Route options for sending raw IP packets */
+enum pal_route_options
+{
+   PAL_PACKET_DONTROUTE   =   (1 << 0)
+};
+
+/* Bitmap to request/reply API for raw sockets */
+enum pal_ipinfo
+{
+  PAL_RECVIF_INDEX          = (1 << 0),
+  PAL_RECVIF_ADDR           = (1 << 1)
+};
+
+/* Bitmap to request/reply API for IPV4 raw sockets. */
+#define PAL_CMSG_IPV4_PKTINFO		(1 << 0)
+#define PAL_CMSG_IPV4_RECVIF		(1 << 1)
+
+/* Bitmap to request/reply API for IPV6 raw sockets. */
+#define PAL_CMSG_IPV6_PKTINFO		(1 << 0)
+#define PAL_CMSG_IPV6_HOPLIMIT		(1 << 1)
+#define PAL_CMSG_IPV6_RTRALRT		(1 << 2)
+#define PAL_CMSG_IPV6_NEXTHOP		(1 << 3)
+
+/* Return structure for raw socket options receive.
+** If a system doesnt have a mechanism to get the ifindex we set the
+** PAL_RECVIF_ADDR with the source address.
+*/
+union pal_cdata
+{
+  u_int32_t ifindex;
+  struct pal_in4_addr addr;
+};
+
+struct pal_cdata_msg
+{
+  enum pal_ipinfo cinfo;
+  union pal_cdata data;
+};
+
+/* Initialize msghdr with allocating buffer of ancillary data
+** 
+** Parameters:
+**   IN   struct pal_msghdr	msg
+**   IN	  u_int32_t		flags
+**
+** Results:
+**   pointer of ancillary data
+**
+*/
+char *
+pal_sock_in4_cmsg_init (struct pal_msghdr *msg, u_int32_t flags);
+
+/* Free ancillary data
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**
+*/
+void
+pal_sock_in4_cmsg_finish (struct pal_msghdr *msg);
+
+/* Set PKTINFO to CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**   IN   struct pal_cmsghdr *	cmsg
+**   IN   struct pal_in4_addr *	addr
+**   IN   u_int32_t		ifindex
+**
+** Results:
+**   Pointer to current CMSG header
+**
+ */
+struct pal_cmsghdr *
+pal_sock_in4_cmsg_pktinfo_set (struct pal_msghdr *msg,
+			       struct pal_cmsghdr *cmsg,
+			       struct pal_in4_addr *src,
+			       u_int32_t ifindex);
+
+/* Get PKTINFO from CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**   pointer to PKTINFO
+**
+ */
+struct pal_in4_pktinfo *
+pal_sock_in4_cmsg_pktinfo_get (struct pal_msghdr *msg);
+
+/* Get RECVIF from CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**   pointer to SOCKADDR_DL
+**
+ */
+struct pal_sockaddr_dl *
+pal_sock_in4_cmsg_recvif_get (struct pal_msghdr *msg);
+
+/* Get IFINDEX from CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**   pointer to SOCKADDR_DL
+**
+ */
+int
+pal_sock_in4_cmsg_ifindex_get (struct pal_msghdr *msg);
+
+int
+pal_sock_in4_cmsg_dst_get (struct pal_msghdr *msg);
+
+/* Return length of IP packet
+**
+** Parameters:
+**    IN    pal_in4_header   *iph
+**    OUT   u_int16_t        *length
+** Results:
+**    RESULT_OK for success, < 0 for error
+*/
+result_t
+pal_in4_ip_packet_len_get (struct pal_in4_header *iph, u_int32_t *length);
+
+/* Set length of IP packet
+**
+** Parameters:
+**   IN/OUT    pal_in4_header   *iph
+**   IN         u_int16_T        length of IP packet
+** Results:
+**   RESULT_OK for success, < 0 for error
+*/
+result_t
+pal_in4_ip_packet_len_set (struct pal_in4_header *iph, u_int32_t length);
+
+/* Return IP header length 
+**
+** Parameters:
+**   IN   pal_in4_header   *iph
+**   OUT  u_int16_t        *length
+** Results:
+**   RESULT_OK for success, < 0 for error
+*/
+result_t
+pal_in4_ip_hdr_len_get (struct pal_in4_header *iph, u_int16_t *length);
+
+/* Set length of IP header given IP options length
+**
+** Parameters:
+**   IN/OUT      pal_in4_header      *iph
+**   IN          u_int16_t           length of IP options field.
+** Results:
+**   RESULT_OK for success, < 0 for error
+*/
+result_t
+pal_in4_ip_hdr_len_set (struct pal_in4_header *iph, u_int16_t length);
+
+/* Set TOS bits in IP header
+** 
+** Parameters:
+**   IN/OUT      pal_in4_header     *iph
+**   IN          s_int32_t          TOS bitmask
+*/
+result_t
+pal_in4_ip_hdr_tos_set (struct pal_in4_header *iph, s_int32_t    tos);
+
+/* Peek packet. This will return the length of the IP packet.
+** Callers should allocate buffer of this size and pass it to
+** pal_ip_recv_packet()
+**
+** Parameters:
+**   IN          sock        socket handle
+**   OUT         *iph        IP header
+**   OUT         *iphdr_len  IP header length
+**   OUt         *ippkt_len  IP packet length
+*/
+result_t
+pal_in4_packet_peek (pal_sock_handle_t sock, struct pal_in4_header *iph,
+		     u_int16_t  *iphdr_len, u_int32_t  *ippkt_len);
+
+/* Recv function for raw sockets with options
+** 
+** Parameters:
+**    IN     sock        socket handle
+**    IN     iph         IP header
+**    OUT    *buf        Pointer to buffer where data will be copied
+**    IN    pkt_len      IP packet length
+**    IN/OUt *cdata      The control message structure. This will contain
+**                       the control data options required on input and
+**                       output.
+** Returns:
+**    RESULT_OK for success, -1 for error.
+*/
+result_t
+pal_in4_recv_packet (pal_sock_handle_t sock, struct pal_in4_header *iph,
+		     u_char *buf, s_int32_t pkt_len,
+		     struct pal_cdata_msg *cmsg);
+
+/* Recv function for raw sockets with options which returns number of bytes
+** received if not all pkt_len bytes are received
+** 
+** Parameters:
+**    IN     sock        socket handle
+**    IN     iph         IP header
+**    OUT    *buf        Pointer to buffer where data will be copied
+**    IN    pkt_len      IP packet length
+**    IN/OUt *cdata      The control message structure. This will contain
+**                       the control data options required on input and
+**                       output.
+** Returns:
+**    RESULT_OK for success, -1 for error, > 0 if number of bytes received
+**    != pkt_len.
+*/
+result_t
+pal_in4_recv_packet_len (pal_sock_handle_t sock, struct pal_in4_header *iph,
+		     u_char *buf, s_int32_t pkt_len,
+		     struct pal_cdata_msg *cmsg);
+
+/* Send IP packet. The IP header needs to be properly populated before
+** calling of this function.
+** 
+** Parameters:
+**   IN           sock            socket handle
+**   IN           *hdr            IP header
+**   IN           *buf            Packet buffer
+**   IN           length          Length of packet buffer
+**   IN           dontroute       Packet send option.
+**
+** Returns:
+**   Number of bytes written or -1 for error.
+*/
+s_int32_t
+pal_in4_send_packet (pal_sock_handle_t sock, struct pal_in4_header *hdr,
+		     s_int32_t hdr_len, u_char *buf, s_int32_t length,
+		     s_int32_t dontroute);
+
+/* Send IP packet. The IP header needs to be properly populated before
+** calling of this function.
+**
+** Parameters:
+**   IN           sock            socket handle
+**   IN           *hdr            IP header
+**   IN           *buf            Packet buffer
+**   IN           *nexthop        Packet nexthop IP address
+**   IN           length          Length of packet buffer
+**   IN           dontroute       Packet send option.
+**
+** Returns:
+**   Number of bytes written or -1 for error.
+*/
+s_int32_t
+pal_in4_send_packet_to_nexthop (pal_sock_handle_t sock, struct pal_in4_header *hdr,
+         s_int32_t hdr_len, struct pal_in4_addr *nexthop, u_char *buf, s_int32_t length,
+         s_int32_t dontroute);
+
+
+#ifdef HAVE_IPV6
+/* Set ICMPv6 checksum socket option
+**
+** Parameters:
+**   IN   pal_sock_handle_t	sock
+**   IN   s_int32_t		state
+**
+** Results:
+**   RESULT_OK for success, < 0 for error;
+**
+ */
+result_t
+pal_sock_set_icmp6_checksum (pal_sock_handle_t sock, s_int32_t state);
+
+/* Calculate aligned length of ancillary data given Flags
+** 
+** Parameters:
+**   IN	  u_int32_t		flags
+**
+** Results:
+**   Aligned length of ancillary data
+**
+*/
+pal_size_t
+pal_sock_in6_cmsg_len_get (u_int32_t flags);
+
+/* Initialize msghdr with allocating buffer of ancillary data
+** 
+** Parameters:
+**   IN   struct pal_msghdr	msg
+**   IN	  u_int32_t		flags
+**
+** Results:
+**   pointer of ancillary data
+**
+*/
+char *
+pal_sock_in6_cmsg_init (struct pal_msghdr *msg, u_int32_t flags);
+
+/* Free ancillary data
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**
+*/
+void
+pal_sock_in6_cmsg_finish (struct pal_msghdr *msg);
+
+/* Set PKTINFO to CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**   IN   struct pal_cmsghdr *	cmsg
+**   IN   struct pal_in6_addr *	addr
+**   IN   u_int32_t		ifindex
+**
+** Results:
+**   Pointer to current CMSG header
+**
+ */
+struct pal_cmsghdr *
+pal_sock_in6_cmsg_pktinfo_set (struct pal_msghdr *msg,
+			       struct pal_cmsghdr *cmsg,
+			       struct pal_in6_addr *addr,
+			       u_int32_t ifindex);
+
+/* Set RTRALRT to CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**   IN   struct pal_cmsghdr *	cmsg
+**   IN   u_int16_t rtralrt     rtralrt
+** Results:
+**   Pointer to current CMSG header
+**
+ */
+struct pal_cmsghdr *
+pal_sock_in6_cmsg_rtralrt_set (struct pal_msghdr *msg,
+			       struct pal_cmsghdr *cmsg,
+                               u_int16_t rtralrt);
+
+/* Set HOPLIMIT to CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**   IN   struct pal_cmsghdr *	cmsg
+**   IN   s_int32_t		hoplimit
+**
+** Results:
+**   Pointer to current CMSG header
+**
+ */
+struct pal_cmsghdr *
+pal_sock_in6_cmsg_hoplimit_set (struct pal_msghdr *msg,
+				struct pal_cmsghdr *cmsg,
+				s_int32_t hoplimit);
+
+/* Get PKTINFO from CMSG header
+**
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**   pointer to PKTINFO
+**
+ */
+struct pal_in6_pktinfo *
+pal_sock_in6_cmsg_pktinfo_get (struct pal_msghdr *msg);
+
+/* Get HOPLIMIT from CMSG header
+** 
+** Parameters:
+**   IN   struct pal_msghdr *	msg
+**
+** Results:
+**   pointer of Hoplimit value 
+** 
+ */
+int *
+pal_sock_in6_cmsg_hoplimit_get (struct pal_msghdr *msg);
+
+/* Send IPv6 packet.
+**
+** Parameters:
+**   IN   pal_sock_handle_t		sock
+**   IN   struct pal_msghdr *		msg
+**   IN   char *			adata
+**   IN   size_t			alen
+**   IN   u_char *			buf
+**   IN   int				length
+**   IN   struct pal_sockaddr_in6 *	sin6
+**
+** Results:
+**   Number of bytes written or -1 for error.
+**
+ */
+result_t
+pal_in6_send_packet (pal_sock_handle_t sock, struct pal_msghdr *msg,
+		     u_char *buf, int length, struct pal_sockaddr_in6 *sin6);
+
+/* Recv IPv6 packet.
+**
+** Parameters:
+**   IN   pal_sock_handle_t		sock
+**   IN   struct pal_msghdr *		msg
+**   IN   u_char *			buf
+**   IN   int				length
+**   IN   struct pal_sockaddr_in6 *	sin6
+**
+** Results:
+**   RESULT_OK for success or -1 for error.
+**
+ */
+result_t
+pal_in6_recv_packet (pal_sock_handle_t sock,
+		     struct pal_msghdr *msg, char *adata, size_t alen,
+		     u_char *buf, int length, struct pal_sockaddr_in6 *sin6);
+
+/* Recv MLD packet.
+**
+** Parameters:
+**   IN   pal_sock_handle_t             sock
+**   IN   struct pal_msghdr *           msg
+**   IN   u_char *                      buf
+**   IN   int                           length
+**   IN   struct sockaddr_mld *         mld
+**
+** Results:
+**   RESULT_OK for success or -1 for error.
+**
+ */
+result_t
+pal_in6_mld_snp_recv_packet (pal_sock_handle_t sock,
+                             struct pal_msghdr *msg, char *adata, size_t alen,
+                             u_char *buf, int length,
+                             struct sockaddr_mld *mld);
+
+/* Peek IPv6 packet.
+**
+** Parameters:
+**   IN   pal_sock_handle_t		sock
+**   IN   struct pal_msghdr *		msg
+**   IN   u_char *			buf
+**   IN   int				length
+**   IN   struct pal_sockaddr_in6 *	sin6
+**
+** Results:
+**   Msg_len for success or -1 for error.
+**
+ */
+result_t
+pal_in6_packet_peek (pal_sock_handle_t sock,
+                     struct pal_msghdr *msg,
+                     char *adata, size_t alen,
+                     u_char *buf, int length,
+                     struct pal_sockaddr_in6 *sin6);
+
+/* Set IPv6 nexthop information.
+**
+** Parameters:
+**   IN   struct pal_msghdr *           msg
+**   IN   struct pal_cmsghdr *          cmsg
+**   IN   struct pal_in6_addr           addr
+**   OUT   struct pal_cmsghdr  *        sin6
+**
+** Results:
+**   Return is NULL in failure else the value of cmsghdr.
+**
+ */
+struct pal_cmsghdr *
+pal_sock_in6_cmsg_nexthop_set (struct pal_msghdr *msg,
+                               struct pal_cmsghdr *cmsg,
+                               struct pal_in6_addr *addr);
+
+
+/* Set the IPv6 Nexthop information for a socket.
+**
+** Parameters
+**
+**  IN    pal_sock_handle_t        sock
+**  IN    struct pal_in6_addr       addr
+**
+** Results:
+**     Msg_len for success or -1 for error.
+**
+*/
+result_t
+pal_sock_set_ipv6_nexthop (pal_sock_handle_t sock, struct pal_in6_addr *addr);
+
+
+/* Get the IPv6 Nexthop information for a socket.
+**
+** Parameters
+**
+**  IN    pal_sock_handle_t         sock
+**  OUT   struct pal_in6_addr       addr
+**
+** Results:
+**     Msg_len for success or -1 for error.
+**
+*/
+result_t
+pal_sock_get_ipv6_nexthop (pal_sock_handle_t sock, struct pal_in6_addr *addr);
+
+/* Unset the IPv6 Nexthop information for a socket.
+**
+** Parameters
+**
+**  IN    pal_sock_handle_t         sock
+**
+** Results:
+**     Msg_len for success or -1 for error.
+**
+*/
+result_t
+pal_sock_unset_ipv6_nexthop (pal_sock_handle_t sock);
+
+#endif /* HAVE_IPV6 */
+
+#endif /* _PAL_SOCK_RAW_DEF */

@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/08-post.dir/08-post.c.o  -o 08-post -rdynamic ../../src/onion/libonion.so -lgnutls -lgcrypt -lpthread -lrt -Wl,-rpath,/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/onion 

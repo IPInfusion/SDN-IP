@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/interactive.dir/interactive.c.o  -o interactive -rdynamic ../../src/onion/libonion_static.a -lgnutls -lgcrypt -lpthread -lrt 

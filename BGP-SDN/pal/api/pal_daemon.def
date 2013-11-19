@@ -1,0 +1,35 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.*/
+
+#ifndef _PAL_DAEMON_DEF
+#define _PAL_DAEMON_DEF
+
+/*
+** Daemonize a process
+**
+** Parameters:
+**   u_int16_t dont_change_dir
+**   u_int16_t dont_close_files
+**
+** Results:
+**   RESULT_OK for success, -ve for error
+*/
+extern result_t pal_daemonize (u_int16_t nochdir, u_int16_t noclose);
+
+/*
+** Spawn a program as a daemon process from a running process.
+** To be used in cases where daemons are spawned from a ever-lasting process.
+**
+** Parameters:
+**   char *program_name
+**   char **argv (List of arguments to the program. Last argument has to
+**                to be null).
+**
+** Results:
+**   RESULT_OK for success, -ve for error
+*/
+result_t
+pal_daemonize_program (char *program, char **argv, u_int16_t nochdir, u_int16_t noclose);
+
+int pal_vrf_pid_set (fib_id_t, pid_t);
+
+#endif /* _PAL_DAEMON_DEF */

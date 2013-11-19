@@ -1,0 +1,73 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_DEBUG_DEF
+#define _PAL_DEBUG_DEF
+
+/* PAL debug API.  */
+
+/*-----------------------------------------------------------------------------
+   Functions
+*/
+
+/* Start the debugging output manager.  This sets up any needed
+   variables and hooks into the OS, and prepares the output device for
+   transactions, as appropriate.  It is only called during startup.
+   It also return a context handle which is stored in the library
+   globals.  If this is called mulitple times without an intervening
+   stop, it always returns the same handle.
+  
+   Parameters
+     none
+  
+   Results
+     A nonzero handle for success
+     NULL for failure
+*/
+extern pal_handle_t pal_debug_start (void);
+
+/* Stop the debugging output manager.  This finishes any pending
+   transactions and shuts down the debugging output manager, breaking
+   any previously created connections to the OS or output device.  It
+   also frees any resources allocated by the debugging output manager.
+   It is only called during the shutdown process.  The starts and
+   stops must be balanced, so the number of times stop must be called
+   before the stop actually happens is the number of times that start
+   was called.
+  
+   Parameters
+     none
+  
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+extern result_t pal_debug_stop (void);
+
+/* Output a debugging message to the debugging output device.  This
+   writes the provided string to the debugging output.  If the
+   implementation wishes, the output may be timestamped or similar,
+   but this is to be done below this call instead of by caller.  Note
+   that the caller must determine whether or not a given debug string
+   is to be displayed -- this will always output it.
+  
+   Parameters
+     IN   u_int32_t instance       : The module instance for the debug output
+     IN   module_id_t module      : The module ID for the debug output
+     IN   char *deb_string      : The string to append to the debug output
+  
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+extern result_t pal_debug_output (u_int32_t instance,
+				  module_id_t module,
+				  char *deb_string);
+
+/*-----------------------------------------------------------------------------
+   Done
+*/
+
+/*
+  Local variables:
+  mode: c
+  end:
+*/
+
+#endif /* _PAL_DEBUG_DEF */

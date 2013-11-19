@@ -1,0 +1,34 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved. */
+#ifndef _PAL_LOG_DEF
+#define _PAL_LOG_DEF
+
+/* PAL logging API.  */
+
+/* Open logging. */
+void *pal_log_open (struct lib_globals *zg, struct zlog *zl, enum log_destination);
+
+/* Close logging. */
+void pal_log_close (struct lib_globals *zg, struct zlog *zl);
+
+/* Log output. */
+void pal_log_output (struct lib_globals *zg, struct zlog *zl,
+                     char *priority_str, char *mod_str, char *buf);
+
+/* Rotate logs. */
+int pal_log_rotate (struct zlog *zl);
+
+#ifdef PAL_LOG_FILESYS
+/* Set logfile. */
+int pal_log_set_file (struct zlog *zl, char *logfile, u_int32_t size);
+
+/* Unset logfile. */
+int pal_log_unset_file (struct zlog *zl, char *logfile);
+#endif /* PAL_LOG_FILESYS. */
+
+/* Start log system. */
+int pal_log_start (struct lib_globals *zg);
+
+/* Stop log system. */
+int pal_log_stop (struct lib_globals *zg);
+
+#endif /* _PAL_LOG_DEF */

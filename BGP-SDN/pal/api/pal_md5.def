@@ -1,0 +1,15 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _BGPSDN_PAL_MD5_DEF
+#define _BGPSDN_PAL_MD5_DEF
+
+/* Use internal MD5 library if MD5 library doesn't exist outside.  */
+#ifndef HAVE_MD5
+#define HAVE_MD5
+#define MD5_CTX				AUTH_MD5_CTX
+#define md5_init_ctx(CTX)		auth_md5_init ((CTX))
+#define md5_process_bytes(PTR,LEN,CTX)	auth_md5_update ((CTX), (PTR), (LEN))
+#define md5_finish_ctx(CTX,DIGEST)	auth_md5_final ((DIGEST), (CTX))
+#endif /* !HAVE_MD5 */
+
+#endif /* _BGPSDN_PAL_MD5_DEF */

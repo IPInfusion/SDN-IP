@@ -1,0 +1,47 @@
+
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved. */
+
+#ifndef _PAL_SYSCTL_DEF
+#define _PAL_SYSCTL_DEF
+
+#define PAL_SYSCTL_KPATH_LEN 128
+
+/*----------------------------------------------------------------------
+ * pal_sysctl_set_int_val_by_param - Setting sysctl param value
+ * pal_sysctl_get_int_val_by_param - Reading sysctl param value
+ *
+ * Parameters 
+ *  sysctl_param - Paramter array 
+ *  val          - Value (setting) or a pointer to a variable (reading).
+ *
+ * pal_sysctl_set_int_val_by_path - Setting /proc/sys value
+ * pal_sysctl_get_int_val_by_path - Reading /proc/sys value
+ *
+ * Parameters
+ *   kpath  	- Partial path to the value: should not include the 
+ *                /proc/sys/ prefix, the terminating / and the value name.
+ *   vname 	- The name of the value (the proc fs leaf name).
+ *   val        - Value (setting) or a pointer to a variable (reading).
+ * 
+ */
+result_t pal_sysctl_set_int_val_by_param (int sysctl_param[], int val);
+result_t pal_sysctl_get_int_val_by_param (int sysctl_param[], int *val);
+result_t pal_sysctl_set_int_val_by_path (char *kpath, char *vname, int val);
+result_t pal_sysctl_get_int_val_by_path (char *kpath, char *vname, int *val);
+
+/*----------------------------------------------------------------------
+ * pal_sysctl_set_int_val - Setting /proc/sys value
+ * pal_sysctl_get_int_val - Reading /proc/sys value
+ * 
+ * Parameters
+ *   kpath  	- Partial path to the value: should not include the 
+ *                /proc/sys/ prefix, the terminating / and the value name.
+ *   vname 	- The name of the value (the proc fs leaf name).
+ *   val        - Value (setting) or a pointer to a variable (reading).
+ * 
+ */
+result_t pal_sysctl_set_int_val(char *kpath, char *vname, int val);
+result_t pal_sysctl_get_int_val(char *kpath, char *vname, int *val);
+
+#endif
+

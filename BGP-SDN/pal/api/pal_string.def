@@ -1,0 +1,360 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_STRING_DEF
+#define _PAL_STRING_DEF
+
+/* PAL string API.  */
+
+/* Start the PAL string.  This sets up any needed variables and hooks
+   into the OS.  It is only called during startup.
+
+  Parameters
+    IN  struct lib_globals *           : A pointer to library globals structure
+
+  Results
+    RESULT_OK for success, else the error which occurred.
+*/
+extern pal_handle_t pal_strstart (struct lib_globals *lib_node);
+
+/* Stop the string manager.  It is only called during the shutdown
+   process.
+  
+   Parameters
+     IN  struct lib_globals *          : A pointer to library globals structure
+  
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+extern result_t pal_strstop (struct lib_globals *lib_node);
+
+/* Formatted print with the output being a string buffer.  It behaves
+   per the standard definition (K&R) of sprintf, except that it will
+   not make the output string longer than the provided length.
+  
+   Parameters
+     OUT char *str                   : A pointer to a buffer for the output
+     IN  size_t size                   : The number of bytes in the buffer
+     IN  const char *format          : A pointer to the format to use
+     IN  ...                           : varargs list of things to insert
+  
+   Results
+     if positive, the number of characters written to the buffer
+     if negative, an error 
+*/
+extern int pal_snprintf (char *str,
+			 size_t size,
+			 const char *format,
+			 ...);
+
+/* Formatted print with the output being a string buffer.  It behaves
+   per the standard definition (K&R) of vsprintf, except that it will
+   not make the output string longer than the provided length.
+  
+   Parameters
+     OUT char *str            : A pointer to the buffer for the output
+     IN  size_t size            : The number of bytes in the buffer
+     IN  const char *format   : A pointer to the format to use
+     IN  va_list args           : va_list of things to insert
+  
+   Results
+     if positive, the number of characters written to the buffer
+     if negative, an error
+*/
+extern int pal_vsnprintf (char *str,
+			  size_t size,
+			  const char *format,
+			  va_list args);
+
+/* Formatted input with the input being a string buffer.  If behaves
+   per the standard definition (K&R) of sscanf.
+  
+   Parameters
+     IN  char *s              : A pointer to the buffer for input
+     IN  const char *format   : A pointer to the format to use
+     OUT ...                    : varargs list of pointers for output
+  
+   Results
+     if positive, the number of items read from the buffer
+     if negative, an error
+*/
+extern int pal_sscanf (const char *s,
+                       const char *format,
+		       ...);
+
+/* Copy a string from one memory cell into another one.  This does NOT
+   check to be sure the destination can hold the string.
+  
+   Parameters
+     OUT char *dst            : A pointer to the copy destination
+     IN  const char *src      : A pointer to the copy source
+  
+   Results
+     dst
+*/
+extern char *pal_strcpy (char *dst,
+			   const char *src);
+
+/* Copy a string from one memory cell into another one, to a specified
+   number of characters; pad right with nulls if src is too short.
+  
+   Parameters
+     OUT char *dst            : A pointer to the copy destination
+     IN  const char *src      : A pointer to the copy source
+     IN  size_t size            : The number of characters to copy
+  
+   Results
+     dst
+*/
+extern char *pal_strncpy (char *dst,
+                            const char *src,
+                            size_t size);
+
+/* Concatenate the 'source' string onto the end of the 'destination'
+   string.  This does NOT check to be sure the final result will fit.
+  
+   Parameters
+     IO  char *dst            : A pointer to the destination string
+     IN  const char *src      : A pointer to the source string
+  
+   Results
+     dst
+*/
+extern char *pal_strcat (char *dst,
+                           const char *src);
+
+/* Concatenate the 'source' string onto the 'destination' string, up
+   to the specified number of characters; pad right with nulls if src
+   too short.
+  
+   Parameters
+     IO  char *dst            : A pointer to the destination string
+     IN  const char *src      : A pointer to the source string
+     IN  size_t size            : The number of characters to copy
+  
+   Results
+     dst
+*/
+extern char *pal_strncat (char *dst,
+                            const char *src,
+                            size_t size);
+
+/* Compare two strings
+  
+   Parameters
+     IN  const char *s1       : A pointer to one string
+     IN  const char *s2       : A pointer to another string
+  
+   Results
+     <0 if s1<s2; =0 if s1==s2; >0 if s1>s2
+*/
+extern result_t pal_strcmp (const char *s1,
+                            const char *s2);
+
+/* Compare two strings up to specified number of characters
+  
+   Parameters
+     IN  const char *s1       : A pointer to one string
+     IN  const char *s2       : A pointer to another string
+     IN  size_t size            : The number of characters to compare
+  
+   Results
+     <0 if s1<s2; =0 if s1==s2; >0 if s1>s2
+*/
+extern result_t pal_strncmp (const char *s1,
+                             const char *s2,
+                             size_t size);
+
+/* Compare two strings, ignoring case
+  
+   Parameters
+     IN  const char *s1       : A pointer to one string
+     IN  const char *s2       : A pointer to another string
+  
+   Results
+     <0 if s1<s2; =0 if s1==s2; >0 if s1>s2
+*/
+extern result_t pal_strcasecmp (const char *s1,
+                                const char *s2);
+
+/* Compare two strings up to specified number of characters, ignoring case
+  
+   Parameters
+     IN  const char *s1       : A pointer to one string
+     IN  const char *s2       : A pointer to another string
+     IN  size_t size            : The number of characters to compare
+  
+   Results
+     <0 if s1<s2; =0 if s1==s2; >0 if s1>s2
+*/
+extern result_t pal_strncasecmp (const char *s1,
+                                 const char *s2,
+                                 size_t size);
+
+/* Find the length of a string in bytes.  This includes the NUL at the end.
+  
+   Parameters
+     IN  char *str            : A pointer to the string to examine
+  
+   Results
+     Length of str in bytes
+*/
+extern size_t pal_strlen (const char *str);
+
+/* Convert the prefix of a string to a signed 32-bit integer, ignoring
+   leading white space, using the specified base, and setting the
+   provided pointer so it points to the next character after the
+   number.  If endp is NULL, it will not be set (so there is no way to
+   check where the parse finished).  The base must be from 2 through
+   36 (inclusive).
+  
+   Parameters
+     IN  const char *s       : A pointer to the string to convert
+     IO  char **endp         : A pointer to a pointer for the next character
+     IN  u_int8_t base          : The base to use
+  
+   Results
+     Signed 32-bit integer value from parsing leading part of s as noted
+     Updates pointer at endp so it points to next character if endp != NULL
+*/
+extern s_int32_t pal_strtos32 (const char *s,
+			       char **endp,
+			       u_int8_t base);
+
+/* Convert the prefix of a string to an unsigned 32-bit integer,
+   ignoring any leading white space, using the specified base, and
+   setting the provided pointer so it points to the next character
+   after the number.  If endp is NULL it will not be set (so there is
+   no way to check where the parse finished).  The base must be from 2
+   through 36 (inclusive).
+  
+   Parameters
+     IN  const char *s       : A pointer to the string to convert
+     IO  char **endp         : A pointer to a pointer for the next character
+     IN  u_int8_t base          : The base to use
+  
+   Results
+     Unsigned 32-bit integer value from parsing leading part of s as noted
+     Updates pointer at endp so it points to next character if endp != NULL
+*/
+extern u_int32_t pal_strtou32 (const char *s,
+			       char **endp,
+			       u_int8_t base);
+
+/* Return a pointer to the first occurrance of a specified character
+   in the given string.
+  
+   Parameters
+     IN  const char *cs      : The string to search
+     IN  char c              : The character to find
+  
+   Results
+     A pointer to the first time the character occurs in the string if found
+     NULL if it does not occur
+*/
+extern char *pal_strchr (const char *cs,
+			 char c);
+
+/* Return a pointer to the last occurrance of a specified character in
+   the given string.
+  
+   Parameters
+     IN  const char *cs      : The string to search
+     IN  char c              : The character to find
+  
+   Results
+     A pointer to the last time the character occurs in the string if found
+     NULL if it does not occur
+*/
+extern char *pal_strrchr (const char *cs,
+			  char c);
+
+/* Return length of prefix of a string which contains characater
+   specified in a second string.
+  
+   Parameters
+     IN  const char *cs      : The string to search
+     IN  const char *ct      : The characters to match
+  
+   Results
+     The number of characters at the beginning of cs which are in ct.
+  
+*/
+extern size_t pal_strspn (const char *cs,
+                          const char *ct);
+
+/* Locate a substring.
+   
+   Parameters
+    IN const char *haystack   : The string in which to search
+    IN const char *needle     : The string to search
+
+   Results
+    A pointer to the start of the substring. If not found returns NULL
+ */
+extern char *pal_strstr (const char *haystack, const char *needle);
+
+/* Return a string which represents a human readable representation of
+   the provided error code.  THE RETURNED STRING IS NOT OWNED BY THE
+   CALLER AND IS TO BE READ ONLY.
+  
+   Parameters
+     IN  size_t n              : The error number to find
+  
+   Results
+     A pointer to a string which gives a name for the error
+*/
+extern char *pal_strerror (size_t n);
+
+/* Scan s for tokens delimited by characters in ct.  The first call in
+   a sequence has s != NULL, It finds the first token in s not
+   consisting of characters in ct, terminates it by overwriting the
+   first character after the token with NUL, and returns a pointer to
+   the token.  Subsequent calls provide s == NULL, and continue from
+   the character just past the NUL from the previous call.  It returns
+   NULL when there are no more tokens.  The ct string may be different
+   each call.
+  
+   Parameters
+     IO  char *s             : A pointer to the string to scan or NULL
+     IN  const char *ct      : A pointer to a string of possible delimiters
+  
+   Results
+     A pointer to the next token in the string or NULL if no more tokens
+     THIS MODIFIES THE STRING SO THE TOKEN IS NULL TERMINATED.
+*/
+extern char *pal_strtok (char *s,
+                           const char *ct);
+
+/* Convert letter to upper or lower case.
+
+   Parameters
+     IN  int c                 : A character or the EOF value
+
+   Results
+     Converted letter, or c if the conversion was not possible.
+*/
+extern int pal_char_tolower (int c);
+extern int pal_char_toupper (int c);
+
+/* Check whether a character is a particular type of character.
+  
+   Parameters
+     IN  int c                 : A character or the EOF value
+  
+   Results
+     Nonzero if character is as specified, zero if not.
+*/
+extern result_t pal_char_isspace (int c);
+extern result_t pal_char_isdigit (int c);
+extern result_t pal_char_isxdigit (int c);
+extern result_t pal_char_isalpha (int c);
+extern result_t pal_char_isalnum (int c);
+extern result_t pal_char_isupper (int c);
+extern result_t pal_char_islower (int c);
+extern result_t pal_char_isprint (int c);
+
+/*
+  Local variables:
+  mode: c
+  end:
+*/
+#endif /* _PAL_STRING_DEF */

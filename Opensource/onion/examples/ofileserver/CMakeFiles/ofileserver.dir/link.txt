@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/ofileserver.dir/fileserver.c.o CMakeFiles/ofileserver.dir/fileserver_html.c.o  -o ofileserver -rdynamic ../../src/onion/handlers/libonion_handlers_static.a ../../src/onion/libonion_static.a -lm -lpam -lpam_misc -lxml2 -lgnutls -lgcrypt -lpthread -lrt 

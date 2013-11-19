@@ -1,0 +1,151 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _PAL_STDLIB_DEF
+#define _PAL_STDLIB_DEF
+
+/* PAL stdlib API. */
+
+/*-----------------------------------------------------------------------------
+   Functions
+*/
+
+/* Start.  */
+extern pal_handle_t pal_stdlib_start (struct lib_globals *lib_node);
+
+/* Stop.  */
+extern result_t pal_stdlib_stop (struct lib_globals *lib_node);
+
+/* Terminate the current process or task and the value of status is
+   returned to the parent.
+  
+   Parameters
+     IN  s_int32_t status   		 : The status value to use 
+
+   Results
+     none
+*/
+extern void pal_exit (s_int32_t status);
+
+/* Return a (pseudo)random number from 0 through RAND_MAX.  If the
+   system has a real random number generator (radioactive decay or
+   similar), it should probably use that instead of the pseudorandom
+   number routine, unless the pseudorandom number routine is faster.
+  
+   Parameters
+     none
+  
+   Results
+     A (pseudo)random number from 0 through RAND_MAX, inclusive.
+*/
+extern s_int32_t pal_rand (void);
+
+/* Seed the (pseudo)random number generator.  If the system has a real
+   random number generator (such as radioactive decay or similar)
+   which is so slow it's not useful as the actual random number
+   generator, it should seed from that instead of here (or maybe munge
+   this with that as a seed).
+  
+   Parameters
+     IN  u_int32_t seed                  : The seed value to use
+  
+   Results
+     none
+*/
+extern void pal_srand (u_int32_t seed);
+
+/* Sort a list of items into ascending order.
+  
+   Parameters
+     IN  void *base                     : A pointer to an array of items
+     IN  size_t n                       : The number of items
+     IN  size_t s                       : The size of *each* item in bytes
+     IN  result_t (*cmp)(const void*,   : A pointer to a function which 
+                         const void*)   :   compares the first & second args
+                                        :   and returns as for memcmp/strcmp
+  
+   Results
+     none
+*/
+extern void pal_qsort (void *base,
+                       size_t n,
+                       size_t s,
+                       s_int32_t (*cmp)(const void*,const void*));
+
+/* Divide 32 bit numerator into 32 bit denominator and return the
+   results.
+  
+   Parameters
+     IN  s_int32_t num                   : The numerator
+     IN  s_int32_t denom                 : The denominator
+  
+   Results
+     div_t containing quotient and remainder
+*/
+#if 0
+extern div32_t pal_div32 (s_int32_t num,
+                          s_int32_t denom);
+#endif /* 0 */
+
+/* Fill in a structure with a bunch of names about the system.
+  
+   Parameters
+     OUT pal_utsname *names             : The buffer for the results
+  
+   Results
+     none
+*/
+extern void pal_uname(struct pal_utsname *names);
+
+/* Encrypt at most eight character from key using salt to perturb DES.
+  
+   Parameters
+     IN  const char *key
+     IN  const char *salt
+     OUT char *buf
+  
+   Results
+     Encrypts data into buf and returns buf.
+*/
+extern char *pal_crypt(const char *key, const char *salt,char *buf);
+
+/* pal_atoi() - dummy atoi function.  */
+extern s_int32_t pal_atoi (char *str);
+
+/* Return length of entire IP packet (based on IP header information).
+
+   Parameters
+     IN  pal_in4_header iphdr
+
+   Results
+     Length of IP packet.
+*/
+extern u_int16_t pal_in4_header_length (struct pal_in4_header *iph);
+
+/* Return current working directory.
+
+   Parameters
+     IN  char *buffer : buffer to store cwd.
+     IN  size_t size  : size of buffer
+
+   Results
+     OUT char *buf    : pointer to buffer or "" (empty string).
+*/
+extern char *pal_getcwd (char *buffer, size_t size);
+
+
+extern u_int32_t pal_geteuid(); 
+
+extern u_int32_t pal_getegid();
+
+extern char * pal_getenv(const char*);
+
+extern u_int32_t pal_sysconf(int);
+
+int pal_SC_PAGESIZE();
+
+extern void pal_system_err (const char *, ...);
+extern void pal_console_err (const char *, ...);
+
+extern void pal_reboot ();
+
+#endif /* _PAL_STDLIB_DEF */

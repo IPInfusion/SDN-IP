@@ -1,0 +1,81 @@
+#------------------------------------------------------------------------------
+#
+# This file specifies the product name and the section name
+#
+# It is used by the generic section makefile to figure out what to expect.
+#
+# This file is where the make process edits need to be
+#
+# There is a reason for the blank after += and not before; leave it there.
+#
+
+#
+# Directory product name and directory name
+#
+# Note that DIR_ADDS includes all sources in any directories listed.
+# DIR_ADDD only makes sure the directory is available in the output space.
+#
+DIR_PROD=SDNBGP
+DIR_NAME=pal
+DIR_OFFS=
+DIR_MODE=lib
+DIR_ADDS=
+DIR_ADDD=
+
+#
+# Adjust so it is relative path to the product top directory
+#
+TOP_DIR=../..
+
+#
+# Additional compilation flags for this module
+#
+MODULE_CFLAGS=
+MODULE_CFLAGS+= -I$(TOP_DIR)/nsm
+
+ifeq ($(ENABLE_PBR_FIB), yes)
+ MODULE_CFLAGS+= -I$(TOP_DIR)/pfw
+endif
+
+
+#
+# Additional targets specified in here which should be made with this module
+#
+DIR_ALLP=
+DIR_DEPP=
+DIR_FDEP=
+DIR_CLNP=
+
+#
+# This allows additional objects (such as provided by vendor) to be
+# linked with the module directly.
+#
+OBJ_ADDS=
+
+#
+# Lists of input files (to handle conditional compilation of files)
+#
+DIR_SRCS=
+DIR_SRCS+= pal_inet.c
+DIR_SRCS+= pal_kernel.c
+DIR_SRCS+= pal_log.c
+DIR_SRCS+= pal_memory.c
+DIR_SRCS+= pal_socket.c
+DIR_SRCS+= pal_stdlib.c
+DIR_SRCS+= pal_string.c
+DIR_SRCS+= pal_time.c
+DIR_SRCS+= pal_sock_ll.c
+DIR_SRCS+= plat_daemon.c
+DIR_SRCS+= pal_posix.c
+DIR_SRCS+= pal_signal.c
+DIR_SRCS+= pal_sysctl.c
+DIR_HDRS=$(wildcard *.h)
+
+#
+# Conditional additions to above
+#
+
+ifeq ($(ENABLE_VTYSH),yes)
+  DIR_SRCS+= pal_ping.c
+  DIR_SRCS+= pal_traceroute.c
+endif

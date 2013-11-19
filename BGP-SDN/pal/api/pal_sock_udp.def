@@ -1,0 +1,57 @@
+/* Copyright (C) 2013 IP Infusion, Inc. All Rights Reserved. */
+
+#ifndef _PAL_SOCK_UDP_DEF
+#define _PAL_SOCK_UDP_DEF
+
+
+#define UDP_BUFSIZ  545
+
+#if defined (IP_PKTINFO)
+#define UDP_CTRL_BUFSIZ sizeof (struct cmsghdr) + \
+sizeof (struct in_pktinfo)
+#elif defined (IP_RECVDSTADDR)  && defined (IP_RECVIF)
+#define UDP_CTRL_BUFSIZ  sizeof (struct cmsghdr) + 4 + \
+sizeof (struct pal_sockaddr_dl)
+#elif defined (IP_RECVDSTADDR)  && ! defined (IP_RECVIF)
+#define UDP_CTRL_BUFSIZ  sizeof (struct cmsghdr) + 4
+#elif defined (PNE_VERSION_3_7)
+#define UDP_CTRL_BUFSIZ   1024
+#else
+#define UDP_CTRL_BUFSIZ     UDP_BUFSIZ
+#endif
+
+/* Bitmap for udp control options */
+enum pal_udp_ctrl_opt
+{
+  PAL_RECV_SRCADDR          = (1 << 0),
+  PAL_RECV_IFINDEX          = (1 << 1),
+  PAL_RECV_DSTADDR          = (1 << 2)
+};
+
+struct pal_udp_ctrl_info
+{
+  enum pal_udp_ctrl_opt c_flag;
+  u_int32_t in_ifindex;
+  struct pal_in4_addr dst_addr;
+  struct pal_sockaddr_in4 src;
+};
+
+/* Recv function for udp sockets with options
+**
+** Parameters:
+**    IN     sock        socket handle
+**    OUT    *buf        Pointer to buffer where data will be copied
+**    IN/OUt *cdata      The control message structure. This will contain
+**                       the control data options required on input and
+**                       output.
+** Returns:
+**    RESULT_OK for success, -1 for error.
+*/
+s_int32_t
+pal_in4_udp_recv_packet (pal_sock_handle_t sock, 
+                         u_char *buf, 
+                         struct pal_udp_ctrl_info *c_info);
+
+#endif /* _PAL_SOCK_UDP_DEF */
+
+

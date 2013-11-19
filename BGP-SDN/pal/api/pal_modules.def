@@ -1,0 +1,14 @@
+/* -*- c -*- */
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _PAL_MODULES_DEF
+#define _PAL_MODULES_DEF
+
+/* This defines the module identifier.  */
+#define IPI_PROTO_UNSPEC        0      /* Unspecified module.  */
+#define IPI_PROTO_LIB           IPI_PROTO_UNSPEC
+#define IPI_PROTO_IMI		1
+#define IPI_PROTO_BGP           2      /* BGP (IPv4/IPv6) */
+#define IPI_PROTO_MAX           3      /* No module.  Must be last.  */
+
+#endif /* _PAL_MODULES_DEF */

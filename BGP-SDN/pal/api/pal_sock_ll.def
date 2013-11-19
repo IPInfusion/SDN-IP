@@ -1,0 +1,194 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _PAL_SOCK_LL_DEF 
+#define _PAL_SOCK_LL_DEF 
+
+/* This file defines PAL Link Layer socket definitions.  */
+
+/* Common constants for all platform.  */
+
+#define PAL_SOCK_LL_UNSPEC		0
+#define PAL_SOCK_LL_ETHERNET		1
+#define PAL_SOCK_LL_CISCO_HDLC		2
+#define PAL_SOCK_LL_VLAN                3
+#define PAL_SOCK_LL_MAX			4
+
+#define PAL_SOCK_LL_TYPE(I)                                                   \
+    ((I)->hw_type == IF_TYPE_ETHERNET ? PAL_SOCK_LL_ETHERNET :                \
+     (I)->hw_type == IF_TYPE_HDLC ? PAL_SOCK_LL_CISCO_HDLC :                  \
+     (I)->hw_type == IF_TYPE_VLAN ? PAL_SOCK_LL_VLAN :                        \
+     PAL_SOCK_LL_UNSPEC)
+
+#define PAL_SOCK_LL_ETHERNET_HEADER_LEN		14
+#define PAL_SOCK_LL_LLC_LEN			 3
+#define PAL_SOCK_LL_CISCO_HDLC_HEADER_LEN	 4
+#define PAL_SOCK_LL_VLAN_HEADER_LEN             18
+
+/* Open Link Layer socket.
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		char *  	Name of device
+**   IN		u_int32_t	Interface index
+**
+** Results:
+**
+**   Socket file descriptier
+**
+*/
+#define pal_sock_ll(M,D,X)                                                    \
+    PAL_SOCK_LL_CALLBACK[(M)].sock_open ((D), (X))
+
+/* Close Link Layer socket.
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**
+** Results:
+**
+**   RESULT_OK for success, < 0 for error
+**
+*/
+#define pal_sock_ll_close(M,S)                                                \
+    PAL_SOCK_LL_CALLBACK[(M)].sock_close ((S))
+
+/* Enable socket for promiscous mode.
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**
+** Results:
+**
+**   RESULT_OK for success, < 0 for error
+**
+*/
+#define pal_sock_ll_promisc_enable(M,S,X)                                     \
+    PAL_SOCK_LL_CALLBACK[(M)].promisc_enable ((S), (X))
+
+/* Disable socket for pomiscous mode.
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**
+** Results:
+**
+**   RESULT_OK for success, < 0 for error
+**
+*/
+#define pal_sock_ll_promisc_disable(M,S,X)                                    \
+    PAL_SOCK_LL_CALLBACK[(M)].promisc_disable ((S), (X))
+
+/* Get physical hardware address.
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**   OUT	char *		Hardware address
+**
+** Results:
+**
+**   RESULT_OK for success, < 0 for error
+**
+*/
+#define pal_sock_ll_phyaddr_get(M,S,X,A)                                      \
+    PAL_SOCK_LL_CALLBACK[(M)].phyaddr_get ((S), (X), (A))
+
+/* Set physical hardware address
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**   IN		char *		Hardware address
+**   IN		int		Length of Hardware address
+**
+** Results:
+**
+**   RESULT_OK for success, < 0 for error
+**
+*/
+#define pal_sock_ll_phyaddr_set(M,S,X,A,L)                                    \
+    PAL_SOCK_LL_CALLBACK[(M)].phyaddr_set ((S), (X), (A), (L))
+
+/* Recv frame from Link Layer socket
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**   OUT	u_char *	Buffer for Link header
+**   IN		size_t		Length of buffer for link header
+**   OUT	u_char *	Buffer for Frame body
+**   IN		size_t		Length of buffer for frame body
+**
+** Results:
+**
+**   Length of received frame body, < 0 if error
+**
+*/
+#define pal_sock_ll_recvmsg(M,S,X,HB,HL,LB,LL)                                \
+    PAL_SOCK_LL_CALLBACK[(M)].recv_msg ((S), (X), (HB), (HL), (LB), (LL))
+
+/* Send frame to Link Layer socket
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**   IN		int		socket file descriptor
+**   IN		u_int32_t	Interface index
+**   IN		u_char *	Buffer for Link header
+**   IN		size_t		Length of buffer for link header
+**   IN		u_char *	Buffer for Frame body
+**   IN		size_t		Length of buffer for frame body
+**
+** Results:
+**
+**   Length fo written frame, < 0 if error
+**
+*/
+#define pal_sock_ll_sendmsg(M,S,X,HB,HL,LB,LL)                                \
+    PAL_SOCK_LL_CALLBACK[(M)].send_msg ((S), (X), (HB), (HL), (LB), (LL))
+
+/* Get length of Link Layer header
+**
+** Parameters:
+**
+**   IN		int		Hardware type of media
+**
+** Results:
+**
+**   Length of Link Layer header
+**
+*/
+#define pal_sock_ll_header_length(M)                                          \
+    (PAL_SOCK_LL_CALLBACK[(M)].header_length)
+
+struct pal_sock_ll_callback_t
+{
+  u_int16_t header_length;
+  int (*sock_open) (char *, u_int32_t);
+  int (*sock_close) (int);
+  int (*promisc_enable) (int, u_int32_t);
+  int (*promisc_disable) (int, u_int32_t);
+  int (*phyaddr_get) (int, u_int32_t, char *);
+  int (*phyaddr_set) (int, u_int32_t, char *, int);
+  int (*recv_msg) (int, u_int32_t, u_char *, size_t, u_char *, size_t);
+  int (*send_msg) (int, u_int32_t, u_char *, size_t, u_char *, size_t);
+};
+
+extern struct pal_sock_ll_callback_t PAL_SOCK_LL_CALLBACK[];
+
+#endif /* _PAL_SOCK_LL_DEF */

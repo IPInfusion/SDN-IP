@@ -1,0 +1,2 @@
+/usr/bin/ar cr libonion_extras.a  CMakeFiles/onion_extras.dir/png.c.o
+/usr/bin/ranlib libonion_extras.a

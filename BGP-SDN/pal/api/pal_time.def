@@ -1,0 +1,183 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_TIME_DEF
+#define _PAL_TIME_DEF
+
+/* PAL time APIs.  */
+
+/*-----------------------------------------------------------------------------
+   Functions
+*/
+
+/* Start.  */
+extern pal_handle_t pal_time_start (struct lib_globals *lib_node);
+
+/* Stop.  */
+extern result_t pal_time_stop (struct lib_globals *lib_node);
+
+/* Get the number of tics since the system started
+  
+   replaces clock()
+  
+   Parameters
+     none
+  
+   Results
+     The number of tics since the system started or -1 if unavailable.
+*/
+extern pal_clock_t pal_time_clock (void);
+
+/* Get the current time.  Returns the current time, plus sets the
+   time_t at the end of the provided pointer (unless pointer is NULL
+   then it only returns the current time).
+  
+   replaces time()
+  
+   Parameters
+     OUT pal_time_t *tp         : A pointer to a time_t to set or NULL
+  
+   Results
+     The current time as a time_t
+*/
+extern pal_time_t pal_time_current (pal_time_t *tp);
+
+/* Get the current system time.  Returns the current time, plus sets the
+   time_t at the end of the provided pointer (unless pointer is NULL
+   then it only returns the current time).
+  
+   replaces time()
+  
+   Parameters
+     OUT pal_time_t *tp         : A pointer to a time_t to set or NULL
+  
+   Results
+     The current time as a time_t
+*/
+extern pal_time_t pal_time_sys_current (pal_time_t *tp);
+
+/* Get time of day and time zone information.  Puts current time, plus
+   the current timezone in the provided space.  Does not return time
+   if t is NULL; does not return timezone if tz is NULL.
+  
+   Parameters
+     OUT struct pal_timeval *t  : A pointer to the timeval to use
+     OUT struct pal_tzval *tz   : A pointer to the tzval to use
+  
+   Results
+     none
+*/
+extern void pal_time_tzcurrent (struct pal_timeval *t,
+				struct pal_tzval *tz);
+
+/* The pal_time_tzcurrent does not return the gettimeofday time, but
+   the gettimeofday time compensated by any system/user time corrections.
+   To get the exact time value, we need to call pal_timeofday macro.
+
+   Get time of day and time zone information.  Puts current time, plus
+   the current timezone in the provided space.  Does not return time
+   if t is NULL; does not return timezone if tz is NULL.
+  
+   Parameters
+     OUT struct pal_timeval *t  : A pointer to the timeval to use
+     OUT struct pal_tzval *tz   : A pointer to the tzval to use
+  
+   Results
+     none
+*/
+#define pal_timeofday gettimeofday
+
+
+/* Take an expanded struct tm and compress it into a time_t.
+  
+   replaces mktime()
+  
+   Parameters
+     IN  struct pal_tm *tp      : A pointer to a struct tm to use
+  
+   Results
+     The struct pal_tm *tp represented as a time_t, or -1 if it's impossible.
+*/
+extern pal_time_t pal_time_mk (struct pal_tm *tp);
+
+/* Take a local time and convert it to GMT (UTC), in expanded form.
+  
+   replaces gmtime()
+  
+   Parameters
+     IN  pal_time_t *tp         : A pointer to the time to convert
+     OUT struct pal_tm *gmt     : A pointer to where to put the expanded GMT
+  
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+extern result_t pal_time_gmt (pal_time_t *tp,
+			      struct pal_tm *gmt);
+
+/* Take a local time and convert it into expanded form.
+  
+   replaces localtime()
+  
+   Parameters
+     IN  pal_time_t *tp         : A pointer to the time to convert
+     OUT struct pal_tm *loc     : A pointer to where to put the expanded form
+  
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+extern result_t pal_time_loc (pal_time_t *tp,
+			      struct pal_tm *loc);
+
+/* Take an expanded time and convert it into string form.  This
+   follows the K&R definition for strftime.
+  
+   Parameters
+     OUT char *s              : A pointer to where to put the string
+     IN  size_t smax            : Maximum length of string
+     IN  const char *fmt        : A pointer to the format to use
+     IN  const struct pal_tm *tp: A pointer to the struct tm to use
+  
+   Results
+     Number of characters in the output string, or zero if it was too large.
+*/
+extern size_t pal_time_strf (char *s,
+                             size_t smax,
+                             const char *fmt,
+                             const struct pal_tm *tp);
+
+
+/* Convert the calendar time into string form. The calendar time is often
+   obtained through a call to pal_time_current ();
+   This function is used to replaced ctime()
+
+   Parameters
+     IN  const pal_time_t *tp :  A pointer to the time_t to use
+     OUT char *buf             :  pointer to character buffer 
+
+   Results
+     RESULT_OK on success. 
+*/
+extern result_t pal_time_calendar (const pal_time_t *tp,
+                                   char *buf); 
+
+/*
+** Delay a process; delay units are in microseconds
+**
+** replaces usleep ()
+**
+** Parameters
+**   IN  pal_time_t t_usec   : Number of microseconds to delay process
+**
+** Results
+**   RESULT_OK for success, else the error which occurred
+*/
+result_t
+pal_delay (pal_time_t t_usec);
+
+/*-----------------------------------------------------------------------------
+   Done
+*/
+/*
+  Local variables:
+  mode: c
+  end:
+*/
+#endif /* _PAL_TIME_DEF */

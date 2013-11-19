@@ -1,0 +1,2 @@
+/usr/bin/ar cr libonion_handlers_static.a  CMakeFiles/onion_handlers_static.dir/static.c.o CMakeFiles/onion_handlers_static.dir/exportlocal.c.o CMakeFiles/onion_handlers_static.dir/opack.c.o CMakeFiles/onion_handlers_static.dir/path.c.o CMakeFiles/onion_handlers_static.dir/internal_status.c.o CMakeFiles/onion_handlers_static.dir/auth_pam.c.o CMakeFiles/onion_handlers_static.dir/webdav.c.o
+/usr/bin/ranlib libonion_handlers_static.a

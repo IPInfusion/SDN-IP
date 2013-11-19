@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/onion/extras/png.c
+png.h
+-
+onion/response.h
+-
+onion/log.h
+-
+
+src/onion/log.h
+
+src/onion/response.h
+types.h
+src/onion/types.h
+stdlib.h
+-
+
+src/onion/types.h
+

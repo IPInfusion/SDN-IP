@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../functions.h
+onion/types.h
+-
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../list.h
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../parser.h
+stdio.h
+-
+onion/types.h
+-
+functions.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../functions.h
+list.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../list.h
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../tags.h
+parser.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../parser.h
+onion/types.h
+-
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/i18n.c
+malloc.h
+-
+onion/codecs.h
+-
+../tags.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../tags.h
+../functions.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/otemplate/templatetags/../functions.h
+
+src/onion/codecs.h
+
+src/onion/types.h
+

@@ -1,0 +1,1 @@
+/usr/bin/gcc  -fPIC -Wall -Werror -O2 -fPIC   -shared -Wl,-soname,libi18n.so -o libi18n.so CMakeFiles/i18n.dir/i18n.c.o 

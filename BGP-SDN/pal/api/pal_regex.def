@@ -1,0 +1,18 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_REGEX_DEF
+#define _PAL_REGEX_DEF
+
+/* PAL regex API.  */
+
+s_int32_t pal_regcomp (pal_regex_t *preg, char *pattern, s_int32_t cflags);
+
+s_int32_t pal_regexec (const pal_regex_t *preg, const char *string, 
+                       size_t nmatch, pal_regmatch_t pmatch[], 
+                       s_int32_t eflags);
+
+size_t pal_regerror (s_int32_t errcode, const pal_regex_t *preg,
+                     char *errbuf, size_t errbuf_size);
+
+void pal_regfree (pal_regex_t *preg);
+
+#endif /* _PAL_REGEX_DEF */

@@ -1,0 +1,24 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_ASSERT_DEF
+#define _PAL_ASSERT_DEF
+
+/* PAL asssert API.  */
+
+/* PAL assert provides assertion mechanism when OS or OS library
+   provides it.
+   
+   Parameters:
+     IN s_int32_t expression    : To be tested expression by assertion.
+  
+   Results:
+     None
+*/
+extern void pal_assert (s_int32_t expression);
+
+/*
+  Local variables:
+  mode: c
+  end:
+*/
+
+#endif /* _PAL_ASSERT_DEF */

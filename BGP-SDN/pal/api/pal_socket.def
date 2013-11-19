@@ -1,0 +1,732 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _PAL_SOCKET_DEF
+#define _PAL_SOCKET_DEF
+
+/* This file defines PAL socket definitions.  */
+
+/* Common constants for all platform.  */
+
+/* Address family numbers from RFC1700.  */
+#define AFI_IP                    1
+#define AFI_IP6                   2
+#define AFI_MAX                   3
+
+/* Subsequent Address Family Identifier.  */
+#define SAFI_UNICAST              1
+#define SAFI_MULTICAST            2
+#define SAFI_UNICAST_MULTICAST    3
+#define SAFI_MAX                  4
+
+/* AFI and SAFI typedefs.  */
+typedef u_int16_t afi_t;
+typedef u_int8_t safi_t;
+
+/* Loopback address 127.0.0.1.  */
+#ifndef INADDR_LOOPBACK
+#define INADDR_LOOPBACK 0x7f000001
+#endif /* !INADDR_LOOPBACK */
+
+/* Maximum size of a hardware address (MAC address or equivalent).  */
+#define IFHWASIZ 20
+
+/* Interface flags.  Any nonsupported ones must be set to zero.  These
+   must be defined in OS PAL file.  */
+
+/* #define IFF_OACTIVE */
+/* #define IFF_SIMPLEX */
+/* #define IFF_LINK0 */
+/* #define IFF_LINK1 */
+/* #define IFF_LINK2 */
+
+/*-----------------------------------------------------------------------------
+   Functions
+*/
+
+/* Initialise the socket support.
+  
+   Parameters
+     none
+  
+   Results
+     A nonzero handle for success
+     NULL for failure
+*/
+extern pal_handle_t pal_sock_start (struct lib_globals *lib_node);
+
+/* Shut down the socket support.
+  
+   Parameters
+     none
+  
+   Results
+     RESULT_OK if success, else the error
+*/
+extern result_t pal_sock_stop (struct lib_globals *lib_node);
+
+/* Create a socket and return the handle for the socket.
+  
+   Parameters
+     IN  int domain
+     IN  int type
+     IN  int protocol
+  
+   Results
+     A handle for the socket or SOCK_ERROR for error
+*/
+extern pal_sock_handle_t pal_sock (struct lib_globals *lib_node,
+				   int domain,
+				   int type,
+				   int protocol);
+
+/* Bind an address to a socket.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  struct pal_sockaddr *my_addr
+     IN  size_t addr_len
+  
+   Results
+     Zero for success, or an error
+*/
+extern result_t pal_sock_bind (pal_sock_handle_t sock,
+			       struct pal_sockaddr *my_addr,
+			       size_t addr_len);
+
+/* Indicate interest in receiving on a socket, and specify the backlog
+   length.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  size_t backlog
+  
+   Results
+     Zero for success, -1 for error
+*/
+extern result_t pal_sock_listen (pal_sock_handle_t sock,
+				 size_t backlog);
+
+/* Check if path is socket and we have permissions to access the socket.
+
+   Parameters:
+       IN path to Unix domain socket
+       OUT 0 success
+           -1 failure (not a socket or permission failure. 
+*/
+extern result_t pal_sock_check (char *path);
+
+
+/* Accept a connection on a socket.  May block (depends upon socket
+   option).  Will return error if no waiting connection and
+   nonblocking.  Will return with new socket to be used for
+   communicating with filled in endpoint if a connection is ready.
+   Will block until connection ready if blocking and there is no
+   connection waiting.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT struct pal_sockaddr *addr
+     OUT size_t *addrlen
+  
+   Results
+     A new socket which can be used to communicate to the remote end,
+     or SOCK_ERROR for error
+*/
+extern pal_sock_handle_t pal_sock_accept (struct lib_globals *lib_node,
+					  pal_sock_handle_t sock,
+					  struct pal_sockaddr *addr,
+					  size_t *addrlen);
+
+/* Read up to count bytes from a socket.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT void *buf
+     IN  size_t count
+  
+   Results
+     The actual number of bytes read, or -1 if an error occurred
+*/
+extern int pal_sock_read (pal_sock_handle_t sock,
+			  void *buf,
+			  size_t count);
+
+/* Read a vector from a socket
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT struct pal_iovec *vector
+     IN  size_t count
+  
+   Results
+     The actual number of bytes read, or -1 if an error occurred
+*/
+extern int pal_sock_readvec (pal_sock_handle_t sock,
+			     struct pal_iovec *vector,
+			     size_t count);
+
+/* Write up to count bytes to a socket.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  const void *buf
+     IN  size_t count
+  
+   Results
+     The actual number of bytes written, or -1 if an error occurred
+*/
+extern int pal_sock_write (pal_sock_handle_t sock,
+			   const void *buf,
+			   size_t count);
+
+/* Write a vector to a socket
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  const iovec *vector
+     IN  size_t count
+  
+   Results
+     The actual number of bytes written, or -1 if an error occurred
+*/
+extern int pal_sock_writevec (pal_sock_handle_t sock,
+			      const struct pal_iovec *vector,
+			      size_t count);
+
+/* Send a message on a socket to the connected endpoint.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  const void *msg
+     IN  size_t count
+     IN  pal_sock_flags_t flags
+  
+   Results
+     Locally detectable errors may return -1, else the number of bytes sent
+*/
+extern int pal_sock_send (pal_sock_handle_t sock,
+			  const void *msg,
+			  size_t count,
+			  pal_sock_flags_t flags);
+
+/* Send a message on a socket to a particular place.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  const void *msg
+     IN  size_t count
+     IN  pal_sock_flags_t flags
+     IN  const struct pal_sockaddr *to
+     IN  size_t tolen
+  
+   Results
+     Locally detectable errors may return -1, else the number of bytes sent
+*/
+extern int pal_sock_sendto (pal_sock_handle_t sock,
+			    const void *msg,
+			    size_t count,
+			    pal_sock_flags_t flags,
+			    const struct pal_sockaddr *to,
+			    size_t tolen);
+
+/* Send a preformatted message on a socket to a particular place
+   (implicit in the preformatted message header).
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  const struct pal_msghdr *msg
+     IN  pal_sock_flags_t flags
+  
+   Results
+     Locally detectable errors may return -1, else the number of bytes sent
+*/
+extern int pal_sock_sendmsg (pal_sock_handle_t sock,
+			     const struct pal_msghdr *msg,
+			     pal_sock_flags_t flags);
+
+/* Receive a message from a connected socket.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT void *buf
+     IN  size_t len
+     IN  pal_sock_flags_t flags
+  
+   Results
+     Number of bytes actually read, or -1 for error
+*/
+extern int pal_sock_recv (pal_sock_handle_t sock,
+			  void *buf,
+			  size_t len,
+			  pal_sock_flags_t flags);
+
+/* Receive a message from a conneted socket (fill in sender info).
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT void *buf
+     IN  size_t len
+     IN  pal_sock_flags_t flags
+     OUT struct pal_sockaddr *from
+     OUT size_t *fromlen
+  
+   Results
+     Number of bytes actually read, or -1 for error
+*/
+extern int pal_sock_recvfrom (pal_sock_handle_t sock,
+			      void *buf,
+			      size_t len,
+			      pal_sock_flags_t flags,
+			      struct pal_sockaddr *from,
+			      size_t *fromlen);
+
+/* Receive a message from a socket.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT struct pal_msghdr *msg
+     IN  pal_sock_flags_t flags
+  
+   Results
+     Number of bytes actually read or -1 for error
+*/
+extern int pal_sock_recvmsg (pal_sock_handle_t sock,
+			     struct pal_msghdr *msg,
+			     pal_sock_flags_t flags);
+
+/* Connect to a socket or peer.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  struct pal_sockaddr *serv_addr
+     IN  size_t addrlen
+  
+   Results
+     Zero for success, or an error.
+*/
+extern result_t pal_sock_connect (pal_sock_handle_t sock,
+				  struct pal_sockaddr *serv_addr,
+				  size_t addrlen);
+
+/* Select (synchronous I/O multiplexing).  Wait up to timeval period
+   for one of the sockets to come ready, then timeout.  Waits forever
+   if timeout is NULL.  Input n on systems which use ints needs to be
+   the highest numbered entry in any given set plus one.  MAY (OR MAY
+   NOT) MODIFY TIMEOUT VALUE TO REFLECT THE REMAINING TIME.  The
+   pal_sock_handleset_t parameters are modified in place to indicate
+   which sockets have changed state.
+  
+   Parameters
+     IN  int n
+     IO  pal_sock_set_t *readset
+     IO  pal_sock_set_t *writeset
+     IO  pal_sock_set_t *exceptset
+     IO  struct pal_timeval *timeout
+  
+   Results
+     The number of sockets which have changed state
+*/
+extern int pal_sock_select (int n,
+			    pal_sock_set_t *readset,
+			    pal_sock_set_t *writeset,
+			    pal_sock_set_t *exceptset,
+			    struct pal_timeval *timeout);
+
+/* Close the socket
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+  
+   Results
+     RESULT_OK for success, or an error
+*/
+extern result_t pal_sock_close (struct lib_globals *lib_node,
+			        pal_sock_handle_t sock);
+
+/* Shut the socket down.  If how == SHUT_RD then disallow reads; how
+   == SHUT_WR disallows writes; how == SHUTRDWR disallows reads or
+   writes.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     IN  int how
+  
+   Results
+     RESULT_OK for success, or an error
+*/
+extern result_t pal_sock_shutdown (pal_sock_handle_t sock,
+				   int how);
+
+/* Get the address assigned to a socket.  On entry, namelen must be
+   initialised to the number of bytes available in the provided
+   buffer; on exit it is the actual length of the name.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT struct pal_sockaddr *name
+     IO  pal_sock_len_t *namelen
+  
+   Results
+     RESULT_OK for success, or an error
+*/
+extern result_t pal_sock_getname (pal_sock_handle_t sock,
+				  struct pal_sockaddr *name,
+				  pal_sock_len_t *namelen);
+
+/* Get the address of the peer on a socket.  On entry, namelen must be
+   initialised to the number of bytes available in the provided
+   buffer; on return, it is the actual length.
+  
+   Parameters
+     IN  pal_sock_handle_t sock
+     OUT struct pal_sockaddr *name
+     IO  pal_sock_len_t *namelen
+  
+   Results
+     RESULT_OK for success, or an error
+*/
+extern result_t pal_sock_getpeer (pal_sock_handle_t sock,
+				  struct pal_sockaddr *name,
+				  pal_sock_len_t *namelen);
+
+/* Translate name of a service location or service name to a set of
+   socket addresses.
+  
+   Parameters
+     IN  const char *name
+     IN  const char *service
+     IN  const struct pal_addrinfo *req
+     OUT struct pal_addrinfo **  pai
+  
+   Results
+     RESULT_OK for success, or an error
+*/
+#ifdef HAVE_IPV6
+extern result_t pal_sock_getaddrinfo (const char *name,
+				      const char *service,
+				      const struct pal_addrinfo *req,
+				      struct pal_addrinfo **pai);
+#endif /* HAVE_IPV6 */
+
+/* Free the storage associated with the addrinfo structure.
+  
+   Parameters
+     IN  pal_addrinfo *ai
+  
+   Results
+     none
+*/
+#ifdef HAVE_IPV6
+extern void pal_sock_freeaddrinfo (struct pal_addrinfo *ai);
+#endif /* HAVE_IPV6 */
+
+/* Get the last error which occurred.
+  
+   Parameters
+     none
+  
+   Results
+     The last error which occurred in this context
+*/
+extern result_t pal_sock_geterr (void);
+
+/* Return pal_servent information using /etc/services file.
+  
+   Parameters
+     IN  char *name
+     IN  char *proto
+  
+   Results
+     struct pal_servent *
+*/
+extern struct pal_servent *pal_getservbyname (char *name, char *proto);
+
+/* Translate name of a service location or service name to a set of
+   socket addresses.
+
+   Parameters
+     IN  const char *name
+
+   Results
+     Pointer to the hostent structure.
+*/
+extern struct pal_hostent *pal_gethostbyname (const char *name);
+
+/* Free the allocated hostent structure.
+
+   Parameters
+     IN  struct pal_hostent *hent
+
+   Results
+     void
+*/
+extern void pal_freehostbyname (struct pal_hostent *hent);
+
+/* If this had been a big endian architecture, these calls could be
+   reduced to a set of macros which do nothing -- very fast, very
+   efficient.  However, we choose to declare the dummy build as little
+   endian (at least here) to provide examples of these functions as
+   they would have to be implemented in that case as well.  Under most
+   conditions these functions are symmetric, that is, the ntoh and
+   hton are the same basic code.
+  
+   If the system is big endian, these become macros...
+  
+   #define pal_ntoh32(x) (x)
+   #define pal_hton32(x) (x)
+   #define pal_ntoh16(x) (x)
+   #define pal_hton16(x) (x)
+  
+   But the function calls allow us type checking and further examples...
+*/
+extern u_int32_t pal_ntoh32 (u_int32_t x);
+extern u_int32_t pal_hton32 (u_int32_t x);
+extern u_int16_t pal_ntoh16 (u_int16_t x);
+extern u_int16_t pal_hton16 (u_int16_t x);
+
+/* Get and set socket options.  */
+result_t pal_sock_get_nonblocking (pal_sock_handle_t sock,
+				   s_int32_t *state);
+result_t pal_sock_set_nonblocking (pal_sock_handle_t sock,
+				   s_int32_t state);
+
+result_t pal_sock_set_tcp_nodelay (pal_sock_handle_t sock, 
+				   s_int32_t state);
+result_t pal_sock_get_tcp_nodelay (pal_sock_handle_t sock, 
+				   s_int32_t *state);
+
+result_t pal_sock_set_bindtodevice (pal_sock_handle_t sock,
+				    const char *ifname);
+result_t pal_sock_get_bindtodevice (pal_sock_handle_t sock,
+				    char *ifname);
+
+result_t pal_sock_set_broadcast (pal_sock_handle_t sock,
+				 s_int32_t state);
+result_t pal_sock_get_broadcast (pal_sock_handle_t sock,
+				 s_int32_t *state);
+
+result_t pal_sock_set_recvbuf (pal_sock_handle_t sock,
+			       s_int32_t size);
+result_t pal_sock_get_recvbuf (pal_sock_handle_t sock,
+			       s_int32_t *size);
+
+result_t pal_sock_set_sendbuf (pal_sock_handle_t sock,
+			       s_int32_t size);
+result_t pal_sock_get_sendbuf (pal_sock_handle_t sock,
+			       s_int32_t *size);
+
+result_t pal_sock_set_reuseaddr (pal_sock_handle_t sock,
+				 s_int32_t state);
+result_t pal_sock_get_reuseaddr (pal_sock_handle_t sock,
+				 s_int32_t *state);
+
+result_t pal_sock_set_reuseport (pal_sock_handle_t sock,
+				 s_int32_t state);
+result_t pal_sock_get_reuseport (pal_sock_handle_t sock,
+				 s_int32_t *state);
+
+result_t pal_sock_get_soerr (pal_sock_handle_t sock,
+                             s_int32_t *state);
+
+result_t pal_sock_set_ipv4_unicast_hops (pal_sock_handle_t sock,
+					 s_int32_t ttl);
+result_t pal_sock_get_ipv4_unicast_hops (pal_sock_handle_t sock,
+					 s_int32_t *ttl);
+
+result_t pal_sock_set_ip_hdr_incl (pal_sock_handle_t sock,
+				   s_int32_t state);
+result_t pal_sock_get_ip_hdr_incl (pal_sock_handle_t sock,
+				   s_int32_t *state);
+
+result_t pal_sock_set_ipv4_tos_prec (pal_sock_handle_t sock,
+				     s_int32_t state);
+result_t pal_sock_get_ipv4_tos_prec (pal_sock_handle_t sock,
+				     s_int32_t *state);
+
+result_t pal_sock_set_ip_recvif (pal_sock_handle_t sock,
+				 s_int32_t state);
+#ifdef HAVE_IPV6
+result_t pal_sock_set_ipv6_recvif (pal_sock_handle_t sock,
+				 s_int32_t state);
+#endif
+
+result_t pal_sock_get_ip_recvif (pal_sock_handle_t sock,
+				 s_int32_t *state);
+
+result_t pal_sock_set_ipv4_multicast_hops (pal_sock_handle_t sock,
+					   s_int32_t ttl);
+result_t pal_sock_get_ipv4_multicast_hops (pal_sock_handle_t sock,
+					   s_int32_t *ttl);
+
+result_t pal_sock_set_ipv4_multicast_loop (pal_sock_handle_t sock,
+					   s_int32_t state);
+result_t pal_sock_get_ipv4_multicast_loop (pal_sock_handle_t sock,
+					   s_int32_t *state);
+
+result_t pal_sock_set_ipv4_multicast_if (pal_sock_handle_t sock,
+					 struct pal_in4_addr addr,
+					 u_int32_t ifindex);
+
+result_t pal_sock_set_ipv4_multicast_join (pal_sock_handle_t sock,
+					   struct pal_in4_addr mc_addr,
+					   struct pal_in4_addr if_addr,
+					   u_int32_t ifindex);
+result_t pal_sock_set_ipv4_multicast_leave (pal_sock_handle_t sock,
+					    struct pal_in4_addr mc_addr,
+					    struct pal_in4_addr if_addr,
+					    u_int32_t ifindex);
+pal_sock_handle_t pal_sock_igmp_join_group (struct lib_globals *lib_node);
+
+pal_sock_handle_t pal_sock_igmp_join_read (struct lib_globals *lib_node);
+
+pal_sock_handle_t pal_sock_igmp_join_write (struct lib_globals *lib_node);
+result_t pal_sock_set_ipv4_mrt_init (pal_sock_handle_t sock, s_int32_t state);
+
+result_t pal_sock_set_ipv4_mrt_done (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_set_ipv4_mrt_assert (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_set_ipv4_pim (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_get_ipv4_pim (pal_sock_handle_t sock, s_int32_t *state);
+
+
+result_t pal_sock_set_ipv4_dstaddr (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_get_ipv4_dstaddr (pal_sock_handle_t sock, s_int32_t *state);
+
+result_t pal_sock_set_ipv4_mrt_igmp_init (pal_sock_handle_t sock, s_int32_t state);
+
+result_t pal_sock_set_ipv4_mrt_igmp_done (pal_sock_handle_t sock, s_int32_t state);
+
+
+/*
+ * Add multicast forwarding entry
+ */
+result_t pal_sock_set_ipv4_mrt_add_mfc (pal_sock_handle_t sock, void *mfc, size_t len);
+
+/*
+ * Delete multicast forwarding entry
+ */
+result_t pal_sock_set_ipv4_mrt_del_mfc (pal_sock_handle_t sock, void *mfc, size_t len);
+
+/*
+ * Update SPT bit of multicast forwarding entry
+ */
+result_t pal_sock_set_ipv4_mrt_spt_bit (pal_sock_handle_t sock, void *mfc, size_t len);
+
+/*
+ * Add vif to multicast forwarder
+ */
+result_t pal_sock_set_ipv4_mrt_add_vif (pal_sock_handle_t sock, void *vif, size_t len);
+
+/*
+ * Delete vif from multicast forwarder
+ */
+result_t pal_sock_set_ipv4_mrt_del_vif (pal_sock_handle_t sock, void *vif, size_t len);
+
+result_t
+pal_sock_set_l2_igmp_filter (pal_sock_handle_t sock,
+                             s_int32_t enable);
+
+result_t
+pal_sock_set_l2_mld_filter (pal_sock_handle_t sock,
+                            s_int32_t enable);
+
+#ifdef HAVE_IPV6
+result_t
+pal_sock6_set_router_alert (pal_sock_handle_t sock, int state,
+                           module_id_t prot_id);
+
+result_t
+pal_sock_set_router_alert (pal_sock_handle_t sock, int state,
+                           module_id_t prot_id);
+
+result_t pal_sock_set_ipv6_checksum (pal_sock_handle_t sock,
+				     s_int32_t state);
+result_t pal_sock_get_ipv6_checksum (pal_sock_handle_t sock,
+				     s_int32_t *state);
+
+result_t pal_sock_set_ipv6_hoplimit (pal_sock_handle_t sock,
+				     s_int32_t hoplim);
+result_t pal_sock_get_ipv6_hoplimit (pal_sock_handle_t sock,
+				     s_int32_t *hoplim);
+
+result_t pal_sock_set_ipv6_multicast_hops (pal_sock_handle_t sock,
+					   s_int32_t hops);
+result_t pal_sock_get_ipv6_multicast_hops (pal_sock_handle_t sock,
+					   s_int32_t *hops);
+
+result_t pal_sock_set_ipv6_unicast_hops (pal_sock_handle_t sock,
+					   s_int32_t hops);
+result_t pal_sock_get_ipv6_unicast_hops (pal_sock_handle_t sock,
+					   s_int32_t *hops);
+
+result_t pal_sock_set_ipv6_multicast_loop (pal_sock_handle_t sock,
+					   s_int32_t hops);
+result_t pal_sock_get_ipv6_multicast_loop (pal_sock_handle_t sock,
+					   s_int32_t *hops);
+
+result_t pal_sock_set_ipv6_multicast_if (pal_sock_handle_t sock,
+					 u_int32_t ifindex);
+
+result_t pal_sock_set_ipv6_multicast_join (pal_sock_handle_t sock,
+					   struct pal_in6_addr mc_addr,
+					   u_int32_t ifindex);
+
+result_t pal_sock_set_ipv6_multicast_leave (pal_sock_handle_t sock,
+					    struct pal_in6_addr mc_addr,
+					    u_int32_t ifindex); 
+
+result_t pal_sock_set_ipv6_pktinfo (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_get_ipv6_pktinfo (pal_sock_handle_t sock, s_int32_t *state);
+
+result_t pal_sock_set_ipv6_hopopts (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_get_ipv6_hopopts (pal_sock_handle_t sock, s_int32_t *state);
+
+#ifdef HAVE_RTADV
+result_t pal_sock_set_ipv6_icmp_filter (pal_sock_handle_t sock,
+                                          struct pal_icmp6_filter *filter);
+#endif /* HAVE_RTADV */
+
+result_t pal_sock_set_ipv6_mrt6_init (pal_sock_handle_t sock, s_int32_t state);
+
+result_t pal_sock_set_ipv6_mrt6_done (pal_sock_handle_t sock, s_int32_t state);
+result_t pal_sock_set_ipv6_mrt6_pim (pal_sock_handle_t sock, s_int32_t state);
+
+/*
+ * Add multicast forwarding entry
+ */
+result_t pal_sock_set_ipv6_mrt6_add_mfc (pal_sock_handle_t sock, void *mfc, size_t len);
+
+/*
+ * Delete multicast forwarding entry
+ */
+result_t pal_sock_set_ipv6_mrt6_del_mfc (pal_sock_handle_t sock, void *mfc, size_t len);
+
+/*
+ * Add vif to multicast forwarder
+ */
+result_t pal_sock_set_ipv6_mrt6_add_vif (pal_sock_handle_t sock, void *vif, size_t len);
+
+/*
+ * Delete vif from multicast forwarder
+ */
+result_t pal_sock_set_ipv6_mrt6_del_vif (pal_sock_handle_t sock, void *vif, size_t len);
+
+#endif /* HAVE_IPV6 */
+
+result_t pal_sock_set_ll_multicast_join (pal_sock_handle_t sock,
+					 u_char *mc_addr,
+					 u_int32_t ifindex);
+
+result_t pal_sock_set_ll_multicast_leave (pal_sock_handle_t sock,
+					  u_char *mc_addr,
+					  u_int32_t ifindex);
+
+result_t pal_sock_set_bindtofib (pal_sock_handle_t sock,
+                                 fib_id_t fib);
+
+result_t pal_sock_get_bindtofib (pal_sock_handle_t sock,
+                                 fib_id_t * fib);
+
+result_t pal_sock_set_router_alert (pal_sock_handle_t sock, int state,
+				    module_id_t prot_id);
+
+#endif /* _PAL_SOCKET_DEF */

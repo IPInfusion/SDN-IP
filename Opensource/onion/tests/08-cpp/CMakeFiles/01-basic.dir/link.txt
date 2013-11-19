@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/01-basic.dir/01-basic.cpp.o  -o 01-basic -rdynamic ../../src/onion/libonion.so ../../src/bindings/cpp/libonioncpp.so -lgnutls -lgcrypt -lpthread -lrt -Wl,-rpath,/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/onion:/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/bindings/cpp 

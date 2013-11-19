@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tools/opack/opack.c
+string.h
+-
+stdio.h
+-
+stdlib.h
+-
+libgen.h
+-
+unistd.h
+-
+dirent.h
+-
+sys/stat.h
+-
+

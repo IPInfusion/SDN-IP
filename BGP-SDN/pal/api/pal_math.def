@@ -1,0 +1,20 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_MATH_DEF
+#define _PAL_MATH_DEF
+
+/* PAL Math API.  */
+float64_t pal_ceil (float64_t x);
+
+float64_t pal_logarithm (float64_t x);
+
+float64_t pal_log10 (float64_t x);
+
+float64_t pal_exponential (float64_t x);
+
+float64_t pal_power (float64_t x, float64_t y);
+
+float64_t pal_modf (float64_t x, float64_t *y);
+
+int pal_isnan (float64_t x);
+
+#endif /* _PAL_MATH_DEF */

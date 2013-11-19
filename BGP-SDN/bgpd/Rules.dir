@@ -1,0 +1,52 @@
+#------------------------------------------------------------------------------
+#
+# This file specifies the product name and the section name
+#
+# It is used by the generic section makefile to figure out what to expect.
+#
+# This file is where the make process edits need to be
+#
+
+#
+# Directory product name and directory name
+#
+# Note that DIR_ADDS includes all sources in any directories listed.
+# DIR_ADDD only makes sure the directory is available in the output space.
+#
+DIR_PROD=SDNBGP
+DIR_NAME=bgpd
+DIR_OFFS=
+DIR_MODE=lib
+DIR_ADDS=
+DIR_ADDD=
+
+#
+# Adjust so it is relative path to the product top directory
+#
+TOP_DIR=..
+
+#
+# Additional compilation flags for this module
+#
+MODULE_CFLAGS=
+MODULE_CFLAGS+= -I.
+
+#
+# Additional targets specified in here which should be made with this module
+#
+DIR_ALLP=
+DIR_DEPP=
+DIR_FDEP=
+DIR_CLNP=
+
+#
+# This allows additional objects (such as provided by vendor) to be
+# linked with the module directly.
+#
+OBJ_ADDS=
+
+#
+# Lists of input files (to handle conditional compilation of files)
+#
+DIR_SRCS=$(wildcard *.c) 
+DIR_HDRS=$(wildcard *.h)

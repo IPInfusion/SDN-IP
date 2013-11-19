@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/mandelbrot.dir/mandelbrot.cpp.o CMakeFiles/mandelbrot.dir/mandel_html.c.o  -o mandelbrot -rdynamic ../../src/onion/libonion_static.a ../../src/onion/extras/libonion_extras.a -lgnutls -lgcrypt -lpthread -lrt -lpng 

@@ -1,0 +1,148 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+
+#ifndef _PAL_TYPES_DEF
+#define _PAL_TYPES_DEF
+
+#include "pal_md5.def"
+#include "pal_modules.def"
+
+/* This file defines PAL type definitions.  */
+
+/* Unreferenced parameter handling macro */
+#define PAL_UNREFERENCED_PARAMETER(PARAM)  ((PARAM) = (PARAM))
+
+/* Maximum of two values */
+#ifndef MAX
+#define MAX(a,b)    ((a) > (b) ? (a) : (b))
+#endif /* !MAX */
+
+/* Minimum of two comparable values */
+#ifndef MIN
+#define MIN(a,b)    ((a) < (b) ? (a) : (b))
+#endif /* !MIN */
+
+/* Flag manipulation macros. */
+#ifdef CHECK_FLAG
+#undef CHECK_FLAG
+#endif /* CHECK_FLAG */
+#define CHECK_FLAG(V,F)      ((V) & (F))
+#ifdef SET_FLAG
+#undef SET_FLAG
+#endif /* SET_FLAG */
+#define SET_FLAG(V,F)        (V) = (V) | (F)
+#ifdef UNSET_FLAG
+#undef UNSET_FLAG
+#endif /* UNSET_FLAG */
+#define UNSET_FLAG(V,F)      (V) = (V) & ~(F)
+#ifdef FLAG_ISSET
+#undef FLAG_ISSET
+#endif /* FLAG_ISSET */
+#define FLAG_ISSET(V,F)      (((V) & (F)) == (F))
+
+/* Single pointer linked list add macro.  */
+#define SLIST_ADD(N,A,TYPE)                           \
+  do {                                                \
+    (A)->prev = NULL;                                 \
+    (A)->next = (N)->TYPE;                            \
+    if ((N)->TYPE)                                    \
+      (N)->TYPE->prev = (A);                          \
+    (N)->TYPE = (A);                                  \
+  } while (0)
+
+/* Single pointer linked list delete macro.  */
+#define SLIST_DEL(N,A,TYPE)                           \
+  do {                                                \
+    if ((A)->next)                                    \
+      (A)->next->prev = (A)->prev;                    \
+    if ((A)->prev)                                    \
+      (A)->prev->next = (A)->next;                    \
+    else                                              \
+      (N)->TYPE = (A)->next;                          \
+  } while (0)
+
+#define pal_EOF -1
+
+/* Loop on each routing protocol module. */
+#define FOREACH_IPI_PROTO(i)                                    \
+  for (i = IPI_PROTO_UNSPEC+1; i < IPI_PROTO_MAX; i++)          \
+    if (i != IPI_PROTO_VTYSH &&                                 \
+        i != IPI_PROTO_IMISH &&                                 \
+        i != IPI_PROTO_IMI)
+
+/* Route types. */
+#define IPI_ROUTE_DEFAULT                0
+#define IPI_ROUTE_KERNEL                 1
+#define IPI_ROUTE_CONNECT                2
+#define IPI_ROUTE_STATIC                 3
+#define IPI_ROUTE_BGP                    4
+#define IPI_ROUTE_SDN			 5
+#define IPI_ROUTE_MAX                    6
+
+/* Route sub types.  (type & 0x8) is ISIS sub type.  */
+#define IPI_ROUTE_BGP_IBGP              12
+#define IPI_ROUTE_BGP_EBGP              13
+#define IPI_ROUTE_BGP_INTERNAL          14
+#define IPI_ROUTE_BGP_CONFED            15
+
+/* Default distance value for the protocols.  */
+#define IPI_DISTANCE_MSTATIC             0
+#define IPI_DISTANCE_STATIC              1
+#define IPI_DISTANCE_EBGP               20
+#define IPI_DISTANCE_IBGP              200
+#define IPI_DISTANCE_SDN	        20
+
+/* Default metric */
+#define IPI_METRIC_SDN			20
+
+/* Default Tag value for static routes */
+#define IPI_TAG_DEFAULT              0
+
+/* Error codes of NSM. */
+#define FIB_ERR_RTEXIST               -1
+#define FIB_ERR_RTUNREACH             -2
+#define FIB_ERR_EPERM                 -3
+#define FIB_ERR_RTNOEXIST             -4
+
+/* NSM message flags */
+#define RIB_FLAG_INTERNAL           0x01
+#define RIB_FLAG_SELFROUTE          0x02
+#define RIB_FLAG_BLACKHOLE          0x04
+#define RIB_FLAG_NON_FIB            0x08
+#define RIB_FLAG_SELECTED           0x10
+#define RIB_FLAG_CHANGED            0x20
+#define RIB_FLAG_STATIC             0x40
+#define RIB_FLAG_STALE              0x80
+
+/* Filter direction.  */
+#define FILTER_IN                 0
+#define FILTER_OUT                1
+#define FILTER_MAX                2
+
+/* BGP-SDN Abstractions for Declaration Specifiers */
+#define pal_static                      static
+#define pal_inline                      inline
+
+/* BGP-SDN types. */
+typedef unsigned char zebra_command_t;
+typedef int module_id_t;
+typedef void void_t;
+
+/* StorageType defined after SNMPv2-TC.txt rfc2559 */
+
+#define STORAGE_TYPE_OTHER       1
+#define STORAGE_TYPE_VOLATILE    2
+#define STORAGE_TYPE_NONVOLATILE 3
+#define STORAGE_TYPE_PERMANENT   4
+#define STORAGE_TYPE_READONLY    5
+
+typedef enum ZRESULT
+{
+  ZRES_ERR     = -1,
+  ZRES_OK      =  0,
+  ZRES_MORE    =  1,
+  ZRES_NO_MORE =  2,
+  ZRES_FAIL    =  3,
+  ZRES_LAST
+} ZRESULT;
+
+#endif /* _PAL_TYPES_DEF */

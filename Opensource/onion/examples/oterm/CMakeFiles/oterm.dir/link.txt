@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/oterm.dir/oterm.c.o CMakeFiles/oterm.dir/oterm_handler.c.o CMakeFiles/oterm.dir/oterm_data.c.o  -o oterm -rdynamic ../../src/onion/handlers/libonion_handlers_static.a ../../src/onion/libonion_static.a -lutil -lpam -lpam_misc -lxml2 -lgnutls -lgcrypt -lpthread -lrt 

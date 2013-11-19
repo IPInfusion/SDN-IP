@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/11-sessions.dir/11-sessions.c.o  -o 11-sessions -rdynamic ../../src/onion/libonion.so -lbsd -lgnutls -lgcrypt -lpthread -lrt -Wl,-rpath,/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/src/onion 

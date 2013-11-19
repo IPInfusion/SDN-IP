@@ -1,0 +1,6 @@
+# --- Please add follwoing to your /etc/services ---
+#
+# BGP-SDN services
+#
+
+bgpd		2605/tcp

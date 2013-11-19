@@ -1,0 +1,1 @@
+All contents of the BGP-SDN folder is licensed under AGPLv3. See AGPL.txt file for more details.

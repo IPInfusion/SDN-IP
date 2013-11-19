@@ -1,0 +1,263 @@
+# Copyright (C) 2013 IP Infusion, Inc.  All rights reserved.
+
+#-----------------------------------------------------------------------------
+#
+# Rules.platform file
+#
+# This describes various aspects of the platform, and allows us to keep
+# the makefile very generic, even the top-level one.
+#
+
+#-----------------------------------------------------------------------------
+#
+# Build environment (platform name)
+#
+BLD_NAME=linux
+
+#
+# This includes the platform options file, which needs to be included from
+# here because the sub-makefiles in the directories don't really know about
+# it, but this file needs it to function, and they include this.  Probably
+# best to keep it this way.  This is probably the only place where the path
+# should ever be expressed in this manner.  Normally, you'd use BLD_BASE.
+#
+include $(TOP_DIR)/platform/$(BLD_NAME)/Rules.options
+
+#-----------------------------------------------------------------------------
+#
+# Installation stage
+#
+
+#
+# Install configuration file samples how...
+#
+# INS_CONF = where to put them
+# INS_CCMD = incantation for the installer
+#
+INS_CONF=$(SYSCONFDIR)
+INS_CCMD=$(INSTALL) -m 600
+
+#
+# Install final executables how...
+#
+# INS_EXES = where to put them
+# INS_ECMD = incantation for the installer
+#
+INS_EXES=$(PREFIX)/sbin
+INS_ECMD=$(INSTALL)
+
+#-----------------------------------------------------------------------------
+#
+# File suffixes used on this platform
+#
+
+#
+# Suffix for an object file
+# This must not be null, and it must not be equal to other _SUFF.
+#
+OBJ_SUFF=.o
+
+#
+# Suffix for archive/library files
+# This must not be null, and it must not be equal to other _SUFF.
+#
+LIB_SUFF=.a
+
+#
+# Suffix for executable files
+# This may be null, but it must not be equal to other _SUFF.
+#
+EXE_SUFF=
+
+#-----------------------------------------------------------------------------
+#
+# Tools we use which seem to vary between platforms
+#
+
+#
+# Compiler and related tools
+#
+# CC = C compiler
+# AR = Archiver / librarian
+# LD = Linker
+#
+ifeq ($(COMPILER_DIR),$(empty))
+COMPILER_DIR=/usr/bin
+endif
+CC=$(COMPILER_DIR)/$(COMPILER_PREFIX)gcc
+AR=$(COMPILER_DIR)/$(COMPILER_PREFIX)ar
+LD=$(COMPILER_DIR)/$(COMPILER_PREFIX)ld
+
+#
+# File manipulation tools
+#
+# MV = File move or rename
+# RM = File remove (delete) forced
+# RR = File remove (delete) recursive and forced
+# CP = File copy
+# MKDIR = make directory
+#
+MV=mv
+RM=rm -f
+RR=rm -rf
+CP=cp
+MKDIR=mkdir
+
+#
+# Special control over console output
+#
+# ECHO_NOCR writes rest of command line without suffix CR or CR/LF
+# ECHO_FORM writes rest of command line parsing backslash escape sequences
+# ECHO_FNCR combines the two functions
+#
+ECHO_NOCR=/bin/echo -n
+ECHO_FORM=/bin/echo -e
+ECHO_FNCR=/bin/echo -n -e
+
+#-----------------------------------------------------------------------------
+#
+# Flags and options for the tools above
+#
+
+#
+# Flags for the archive/library program
+#
+ARFLAGS=-r
+
+#
+# Flags for the final stage link
+#
+LDFLAGS=
+#LDLIBS=md5 m crypt crypto snmp ncurses
+#LDLIBS_FLAGS=$(addprefix -l,$(LDLIBS))
+LDLIBS_FLAGS=$(LIBS) $(LD_PATH)
+
+ifeq ($(ENABLE_STATIC), yes)
+LDFLAGS=-static
+endif
+
+#
+# Architecture flags for the C compiler
+# Please leave the first line blank, and be sure to put the space at the
+# beginning of additional lines.  Just follow the example.  Comment out
+# or remove options which don't apply.
+#
+#ARCH_CFLAGS= -Werror
+ARCH_CFLAGS+= -I$(TOP_DIR)
+ARCH_CFLAGS+= -I$(API_BASE)
+ARCH_CFLAGS+= -I$(PAL_BASE)
+ARCH_CFLAGS+= -I$(LIB_BASE)
+ARCH_CFLAGS+= -I$(BLD_BASE)
+ARCH_CFLAGS+= $(EXTRA_CFLAGS)
+#ARCH_CFLAGS+= -ansi
+#ARCH_CFLAGS+= -pedantic
+ARCH_CFLAGS+= -Wall
+ARCH_CFLAGS+= -fno-builtin
+ARCH_CFLAGS+= -funsigned-char
+ARCH_CFLAGS+= -fno-signed-char
+ARCH_CFLAGS+= -fno-strict-aliasing
+
+ARCH_CFLAGS+= -I$(TOP_DIR)/sys_params/default
+
+# See if this compiler supports this option
+ifeq ($(COPT_NO_POINTER_SIGN),yes)
+ARCH_CFLAGS+= -Wno-pointer-sign
+endif
+
+#ifeq ($(COPT_NO_WORKING_DIRECTORY),yes)
+#ARCH_CFLAGS+= -fno-working-directory
+#endif
+
+#ARCH_CFLAGS+= -Wredundant-decls
+ARCH_CFLAGS+= -Wlong-long
+ARCH_CFLAGS+= -Wnested-externs
+#ARCH_CFLAGS+= -Wcast-qual
+#ARCH_CFLAGS+= -Wcast-align
+#ARCH_CFLAGS+= -L/usr/lib
+
+ifeq ($(ENABLE_MEMMGR),yes)
+  ARCH_CFLAGS+= -I$(TOP_DIR)/lib/memmgr
+endif
+
+#
+# Debugging flags for the C compiler (leave the first line alone)
+#
+DEBUG_CFLAGS=
+#DEBUG_CFLAGS+= -g
+
+#-----------------------------------------------------------------------------
+#
+# Actual commands starting to be put together
+#
+
+#
+# Ways to make a few things
+#
+# MAKE_SINGLE_DEPS is the depend invocation (assumed : input.c)
+# MAKE_SINGLE_FILE is the compiler invocation (assumed : -o output.o input.c)
+# MAKE_LIBRARY_FILE is the librarian invocation (assumed : output.a input_list)
+# MAKE_OUTPUT_FILE is the linker invocation (assumed : -o output input_list)
+#
+MAKE_SINGLE_DEPS=$(CC) -M $(ARCH_CFLAGS) $(DEBUG_CFLAGS) $(IPNET_CFLAGS)
+MAKE_SINGLE_FILE=$(CC) -c $(ARCH_CFLAGS) $(DEBUG_CFLAGS) $(IPNET_CFLAGS)
+MAKE_OUTPUT_FILE=$(CC) $(ARCH_CFLAGS) $(DEBUG_CFLAGS) $(LDFLAGS) $(IPNET_CFLAGS)
+MAKE_SINGLE_DEPS_1=$(CC) -M $(ARCH_CFLAGS) $(DEBUG_CFLAGS)
+MAKE_SINGLE_FILE_1=$(CC) -c $(ARCH_CFLAGS) $(DEBUG_CFLAGS)
+MAKE_OUTPUT_FILE_1=$(CC) $(ARCH_CFLAGS) $(DEBUG_CFLAGS) $(LDFLAGS)
+LINK_OUTPUT_FILE=$(LD) $(LDFLAGS)
+MAKE_LIBRARY_FILE=$(AR) $(ARFLAGS)
+
+#-----------------------------------------------------------------------------
+#
+# These are calculated from the data above, and from the configuration data
+# in Rules.options.  They would be in the Makefile except that they are needed
+# by the sub-makefiles even when they run locally.  Please do not modify, save
+# to add new features or protocols.
+#
+
+#
+# Path collection
+#
+BLD_BASE=$(TOP_DIR)/platform/$(BLD_NAME)
+OBJ_BASE=$(TOP_DIR)/platform/$(BLD_NAME)/obj
+EXE_BASE=$(TOP_DIR)/platform/$(BLD_NAME)/bin
+DEP_BASE=$(TOP_DIR)/platform/$(BLD_NAME)/dep
+API_BASE=$(TOP_DIR)/pal/api
+PAL_BASE=$(TOP_DIR)/pal/$(BLD_NAME)
+LIB_BASE=$(TOP_DIR)/lib
+
+#
+# Extra libraries
+#
+EXTRA_LIBS=
+HW_SDK_LIBS=
+HW_EXTRA_LIBS=
+
+#
+# Directories to include in the build (these are off TOP_DIR)
+#
+ALL_TGTD=pal lib
+ALL_EXES=
+ALL_EXEN=
+ALL_EXEI=
+ALL_EXED=
+ALL_EXEHW=
+APS_EXES=
+APS_OUTPUT=imi.a imi.o
+
+ifeq ($(ENABLE_BGPD),yes)
+ALL_TGTD+= bgpd
+ALL_EXES+= bgpd
+ALL_EXED+= bgp
+endif
+
+ifeq ($(ENABLE_VTYSH),yes)
+ALL_TGTD+= vtysh
+ALL_EXES+= vtysh
+ALL_EXEI+= vtysh
+endif
+
+ifeq ($(ENABLE_BGP_SDN),yes)
+ARCH_CFLAGS+= -I$(TOP_DIR)/Opensource/onion/src
+EXTRA_LIBS+= $(TOP_DIR)/Opensource/onion/src/onion/libonion_static.a
+endif

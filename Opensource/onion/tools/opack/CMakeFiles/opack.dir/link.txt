@@ -1,0 +1,1 @@
+/usr/bin/gcc  -Wall -Werror -O2 -fPIC    CMakeFiles/opack.dir/opack.c.o  -o opack -rdynamic 

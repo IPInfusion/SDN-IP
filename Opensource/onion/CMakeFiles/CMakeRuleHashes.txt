@@ -1,0 +1,13 @@
+# Hashes of file build rules.
+48ccd6c31d6d8ffe7df6d2260b14343b examples/mandelbrot/mandel_html.c
+2867f29d191ca439be45edf6740119a2 examples/ofileserver/fileserver_html.c
+27515b2eef8ad526cbf621e232f4a7db examples/oterm/oterm_data.c
+be5fbe2b97d6d3c824876c74822829ea examples/otop/otop_data.c
+d056c751b6f3c2886ab1cfa2325e3c36 tests/01-internal/13-otemplate_html.c
+e11f196bd8e53ccfd0778d163c130fe3 tests/02-fullserver/CMakeFiles/01-userver.sh
+c37210270f8e9fdbd962a90f38a32da3 tests/07-otemplate/base_html.c
+ff14e180f5e3815dcb2329c68e185afb tests/07-otemplate/extended_html.c
+47602a395bc1912f1760c21746b12225 tests/07-otemplate/external_html.c
+ef071e85cb1fe4bb490abe5d0e857da6 tests/07-otemplate/test_html.c
+b13cea36954e4696e88f2b002a3fd46f tests/CMakeFiles/auto.sh
+2cf7c6053542372b98cb354205108915 tools/compilerunloop/CMakeFiles/crl

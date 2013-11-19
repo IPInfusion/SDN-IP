@@ -1,0 +1,63 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved. */
+#ifndef _PAL_INET_DEF
+#define _PAL_INET_DEF
+
+/* PAL inet API.  */
+
+/* pal_inet_ntoa ()
+  
+   Parameters:
+     IN  struct pal_in4_addr in         : IPv4 address to translate
+     OUT char *buf                    : pointer to character buffer
+  
+   Results:
+     RESULT_OK on success
+*/
+extern result_t pal_inet_ntoa (struct pal_in4_addr in, char * buf);
+
+/* pal_inet_aton ()
+   
+   Parameters:
+     IN  char *buf                    : pointer to character buffer
+     OUT struct pal_in4_addr in         : IPv4 address to translate
+     
+   Results:
+     Non zero if address is valid, zero if not
+*/
+extern s_int32_t pal_inet_aton (char *buf, struct pal_in4_addr *in);
+
+/* Convert address to its 'presentation' form (ASCII? EBCDIC? JIS?) and store
+   it in the provided buffer of given length.
+  
+   Parameters
+     IN  int family            : The address family
+     IN  const void *address   : A pointer to the address to convert
+     OUT char *buf           : A pointer to the buffer to use
+     IN  size_t len            : The length of the buffer
+  
+   Results
+     non-null pointer to buf, NULL for error 
+*/
+extern const char* pal_inet_ntop (int family,
+                               const void *address, char * buf, size_t len);
+
+/* Convert address from its 'presentation' form into the proper (network byte
+   order) format, storing it in the provided buffer of the specified length.
+  
+   Parameters
+     IN  int family            : The address family
+     IN  const char *str     : A pointer to the presentation form
+     OUT void *buf             : A pointer to the buffer to use
+  
+   Results
+      -ve for invalid address family,
+      0 if str doesnot represent a valid network address.
+      +ve value for success
+*/
+extern s_int32_t pal_inet_pton (int family, const char * str, void *buf);
+
+#ifndef IN_LOOPBACK
+#define IN_LOOPBACK(a)	((((u_int32_t) (a)) & 0xff000000) == 0x7f000000)
+#endif /* !IN_LOOPBACK */
+
+#endif /* _PAL_INET_DEF */

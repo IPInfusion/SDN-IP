@@ -1,0 +1,43 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved.  */
+#ifndef _PAL_MEMORY_DEF
+#define _PAL_MEMORY_DEF
+
+/* This file defines PAL memory related definitions and APIs.  */
+
+/* Preallocate memory. */
+void *pal_mem_prealloc (size_t size);
+
+/* Initialize memory for memory type. */
+int pal_mem_type_init (enum memory_type type);
+
+/* Deinitialize memory for memory type. */
+int pal_mem_type_deinit (enum memory_type type);
+
+/* Allocate memory. */
+void *pal_mem_malloc (enum memory_type type, size_t size);
+
+/* Allocate memory and initialize it to zero. */
+void *pal_mem_calloc (enum memory_type type, size_t size);
+
+/* Free memory. */
+void pal_mem_free (enum memory_type type, void *ptr);
+
+/* Reallocate memory. */
+void *pal_mem_realloc (enum memory_type type, void *ptr, size_t size);
+
+/* fill memory with a constant byte. */
+void *pal_mem_set(void *s, int c, size_t n);
+
+/* compare memory areas. */
+int pal_mem_cmp(const void *s1, const void *s2, size_t n);
+
+/* copy memory area. */
+void *pal_mem_cpy(void *dest, const void *src, size_t n);
+
+/* copy memory area. */
+void *pal_mem_move(void *dest, const void *src, size_t n);
+
+/* Duplicate string. */
+char *pal_strdup(enum memory_type type, const char *s);
+
+#endif /* _PAL_MEMORY_DEF */

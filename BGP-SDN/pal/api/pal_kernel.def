@@ -1,0 +1,757 @@
+/* Copyright (C) 2013 IP Infusion, Inc.  All Rights Reserved. */
+
+#ifndef _PAL_KERNEL_DEF
+#define _PAL_KERNEL_DEF
+
+#include "stream.h"
+
+/* PAL kernel API.  */
+
+struct rib;
+struct stream;
+struct prefix;
+#ifdef HAVE_IPV6
+struct prefix_ipv6;
+#endif /* HAVE_IPV6 */
+
+/* Functions.  */
+
+/* Start the kernel control manager.  This sets up any needed
+   variables and hooks into the OS, and prepares the kernel for
+   transactions, as appropriate.  It is only called during startup.
+   The handle returned is stored in the library globals.  If this is
+   called multiple times without an intervening stop, it must return
+   the same handle.
+
+   Parameters
+     none
+
+   Results
+     A nonzero handle for success
+     NULL for failure
+*/
+result_t pal_kernel_start (void);
+
+/* Stop the kernel control manager.  This finishes any pending
+   transactions and shuts down the kernel control manager, breaking
+   any previously created connections to the kernel or OS.  It also
+   frees any resources allocated by the kernel control manager.  It is
+   only called during the shutdown process.  The stops and starts must
+   be balanced, so stop must be called the same number of times as
+   start before the stop is committed.
+
+   Parameters
+     none
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_stop (void);
+
+/* Scan the kernel routing table and load these routes into our RIB.
+
+   Parameters
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_route_scan ();
+
+/* Scan the kernel interface list and create interfaces in our
+   interface list.
+
+   Parameters
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_if_scan (void);
+
+/* Scan the kernel interface list and update interfaces
+
+   Parameters
+
+   Results:
+       None
+*/
+void pal_kernel_if_update (void);
+
+
+/* Fill in the information for an interface.
+
+   Parameters
+     IO  struct interface *ifp : The interface to use
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_if_info (struct interface *ifp);
+
+/* Check the current state of IPv4 forwarding in the kernel.  State
+   returns as nonzero for on, zero for off.
+
+   Parameters
+     OUT int      *state       : A pointer to an int to hold the state
+
+   Results
+     zero for off or one for on if success, else the error which occurred
+*/
+result_t pal_kernel_ipv4_forwarding_get (s_int32_t * state);
+
+/* Sets the IPv4 forwarding state in the kernel.
+
+   Parameters
+     IN  int      state        : The new state to use (nonzero = on)
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_ipv4_forwarding_set (s_int32_t state);
+
+/* Add a new entry to the kernel IPv4 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to add to the table
+     IN  struct rib *r         : A pointer to the rib entry to add to the table
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv4_add (struct prefix *p, struct rib *r);
+
+/* Remove an existing entry from the kernel IPv4 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to remove
+     IN  struct rib *r         : A pointer to the rib entry to remove
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv4_del (struct prefix *p, struct rib *r);
+
+/* Update an existing entry in the kernel IPv4 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to update
+     IN  struct rib *r         : A pointer to the current rib entry
+     IN  struct rib *s         : A pointer to the new rib entry
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv4_update (struct prefix *p,
+                                 struct rib *r,
+                                 struct rib *s);
+
+#ifdef HAVE_IPV6
+
+/* Check the current state of IPv6 forwarding in the kernel.
+
+   Parameters
+     OUT int      *state       : A pointer to an int to hold the state
+
+   Results
+     zero for off or one for on if success, else the error which occurred
+*/
+result_t pal_kernel_ipv6_forwarding_get (s_int32_t * state);
+
+/* Turns on IPv6 forwarding in the kernel.
+
+   Parameters
+     IN  s_int32_t state        : New state(nonzero = on)
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_ipv6_forwarding_set (s_int32_t state);
+
+/* Add a new entry to the kernel IPv6 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to add to the table
+     IN  struct rib *r         : A pointer to the rib entry to add to the table
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv6_add (struct prefix *p, struct rib *r);
+
+/* Remove an existing entry from the kernel IPv6 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to remove
+     IN  struct rib *r         : A pointer to the rib entry to remove
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv6_del (struct prefix *p, struct rib *r);
+
+/* Update an existing entry in the kernel IPv6 forwarding table.
+
+   Parameters
+     IN  struct prefix *p      : A pointer to the prefix to update
+     IN  struct rib *r         : A pointer to the current rib entry
+     IN  struct rib *s         : A pointer to the new rib entry
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_ipv6_update (struct prefix *p,
+                                 struct rib *r,
+                                 struct rib *s);
+
+/* Remove an existing entry from the kernel IPv6 forwarding table,
+   [old version?]
+
+   Parameters
+     IN  struct prefix_ipv6 *dest
+     IN  struct pal_in6_addr *gate
+     IN  u_int32_t index
+     IN  u_int32_t flags
+     IN  u_int32_t table
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_ipv6_old_del (struct prefix_ipv6 *dest,
+                                  struct pal_in6_addr *gate,
+                                  u_int32_t index,
+                                  u_int32_t flags, u_int32_t table);
+result_t pal_kernel_nd_nbadvt_send (struct lib_globals *lib_node,
+                                    struct stream *ap,
+                                    struct interface *ifp);
+result_t pal_kernel_virtual_ipv6_add (struct lib_globals *lib_node,
+                                      struct pal_in6_addr *vip6,
+                                      struct interface *ifp,
+                                      bool_t owner,
+                                      u_int8_t vrid);
+result_t pal_kernel_virtual_ipv6_delete (struct lib_globals *lib_node,
+                                         struct pal_in6_addr *vip6,
+                                         struct interface *ifp,
+                                         bool_t owner,
+                                         u_int8_t vrid);
+#endif /* HAVE_IPV6 */
+
+/* Get ifindex for a interface
+
+   Parameters:
+      IO struct interface *ifp : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_get_index (struct interface *ifp);
+
+/* Get interface metric
+
+   Parameters:
+       IO struct interface *ifp: Interface pointer
+
+   Results:
+       RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_get_metric (struct interface *ifp);
+
+/* Set interface mtu
+
+   Parameters:
+      IN IO struct interface *ifp : Interface pointer
+      IN s_int32_t mtu_size       : Selected mtu size
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_set_mtu(struct interface *ifp, int mtu_size);
+
+/* Set interface proxy arp
+
+   Parameters:
+      IN IO struct interface *ifp : Interface pointer
+      IN s_int32_t proxy_arp      : Selected proxy arp
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_set_proxy_arp (struct interface *ifp,
+                                      s_int32_t proxy_arp);
+
+/* Set interface duplex
+
+   Parameters:
+      IN IO struct interface *ifp : Interface pointer
+      IN u_int8_t duplex          : duplex type
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_set_duplex (struct interface *ifp,
+                                   u_int32_t duplex);
+/* Get interface duplex
+
+   Parameters:
+      IN IO struct interface *ifp : Interface pointer
+      IN u_int8_t duplex          : duplex type
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_get_duplex (struct interface *ifp,
+                                   u_int32_t *duplex);
+
+/* Get interface mtu
+
+   Parameters:
+        IO struct interface *ifp : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_get_mtu (struct interface *ifp);
+
+/* Get HW address
+
+   Parameters:
+      IO struct interface *ifp : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_get_hwaddr (struct interface *ifp);
+
+/* Set HW address - physical, logical or virtual
+
+   Parameters:
+      IO struct interface *ifp : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_set_hwaddr (struct lib_globals *zg,
+                                   struct interface *ifp,
+                                   u_int8_t         *mac_addr,
+                                   s_int32_t         mac_addr_len);
+
+
+/* Get the bandwidth and write the value to the ifp structure.
+
+   Parameters
+     IO   struct interface *ifp : Ponter to the interface
+
+   Results
+    RESULT_OK for success, else the error which occured.
+*/
+result_t pal_kernel_if_get_bw (struct interface *ifp);
+
+/* Get the flags for an interface and write the current value to the
+   flags in the interface structure.  PAL implementation must also
+   specify the bit positions for the flags.
+
+   Parameters
+     IO  struct interface *ifp : A pointer to the interface to check
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_if_flags_get (struct interface *ifp);
+
+/* Set an interface flag and update the actual interface so it is
+   consistent.  This uses the bit flag bit positions given by the PAL
+   implementation.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to update
+     IN  u_int32_t flag         : Which flag to set
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_if_flags_set (struct interface *ifp, u_int32_t flag);
+
+/* Unset an interface flag and update the actual interface so it is
+   consistent.  This uses the bit flag positions given by the PAL
+   implementation.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to update
+     IN  u_int32_t flag         : Which flag to unset
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_if_flags_unset (struct interface *ifp, u_int32_t flag);
+
+/* Set an IPv4 address, mask, broadcast address, for an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv4_address_add (struct interface *ifp,
+                                         struct connected *ifc);
+
+/* Remove an IPv4 address, mask, broadcast address, from an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv4_address_delete (struct interface *ifp,
+                                            struct connected *ifc);
+
+/* Remove all IPv4 addresses from an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the top of connected addresses
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+
+result_t pal_kernel_if_ipv4_address_delete_all (struct interface *ifp,
+                                                struct connected *ifc);
+
+/* Update primary IPv4 address for an interface
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc_old : A pointer to the connected address to delete
+     IN  struct connected *ifc_new : A pointer to the connected address to add
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+
+result_t pal_kernel_if_ipv4_address_update (struct interface *ifp,
+                                            struct connected *ifc_old,
+                                            struct connected *ifc_new);
+#ifdef KERNEL_ALLOW_OVERLAP_ADDRESS
+/* Update secondary IPv4 address for an interface
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc_old : A pointer to connected address to delete
+     IN  struct connected *ifc_new : A pointer to the connected address to add
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+
+result_t pal_kernel_if_ipv4_secondary_address_update (struct interface *ifp,
+                                                      struct connected *ifc_old,
+                                                      struct connected *ifc_new);
+#endif /* KERNEL_ALLOW_OVERLAP_ADDRESS */
+
+/* Set an IPv4 secondary address, mask, broadcast address, for an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv4_address_secondary_add (struct interface *ifp,
+                                                   struct connected *ifc);
+
+/* Remove an IPv4 secondary address, mask, broadcast address, from an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv4_address_secondary_delete (struct interface *ifp,
+                                                      struct connected *ifc);
+
+#ifdef HAVE_IPV6
+
+/* Set an IPv6 address, mask, broadcast address, for an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv6_address_add (struct interface *ifp,
+                                         struct connected *ifc);
+
+/* Remove an IPv6 address, mask, broadcast address, from an interface.
+
+   Parameters
+     IN  struct interface *ifp : A pointer to the interface to use
+     IN  struct connected *ifc : A pointer to the connected address to use
+
+   Results
+     RESULT_OK for success, else the error which occurred
+*/
+result_t pal_kernel_if_ipv6_address_delete (struct interface *ifp,
+                                            struct connected *ifc);
+
+#endif /* HAVE_IPV6 */
+
+/* Resolve an IPv4 address into a layer 2 address.
+
+   Parameters
+     IN  u_int32_t instance     : The instance to use
+     IN                        : The IPv4 address to resolve
+     OUT                       : A pointer to the place to put the L2 address
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_L2_ipv4_resolve (u_int32_t instance);
+
+#ifdef HAVE_IPV6
+
+/* Resolve an IPv6 address into a layer 2 address.
+
+   Parameters
+     IN  u_int32_t instance     : The instance to use
+     IN                        : The IPv6 address to resolve
+     OUT                       : A pointer to the place to put the L2 address
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_kernel_L2_ipv6_resolve (u_int32_t instance);
+
+#endif /* HAVE_IPV6 */
+
+#ifdef HAVE_MIP6
+
+/* Set home agent interface
+
+   Parameters
+     IN                        : Interface pointer
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_if_mip6_home_agent_set (struct interface *ifp);
+
+/* Unset home agent interface
+
+   Parameters
+     IN                        : Interface pointer
+
+   Results
+     RESULT_OK for success, else the error which occurred.
+*/
+result_t pal_if_mip6_home_agent_unset (struct interface *ifp);
+
+#endif /* HAVE_MIP6 */
+
+#ifdef HAVE_VRRP
+/* The following functions are called by the VRRP protocol only.  They
+   are kernel functions that will call respective plat_vrrp.c
+   functions.  */
+
+/* Initialize the platform data for VRRP.
+
+   Parameters
+      IO struct lib_globals *lib_node   : Global variables
+
+   Results
+    RESULT_Ok on success, else the error which occurred.
+
+*/
+result_t pal_kernel_vrrp_start (struct lib_globals *lib_node);
+
+/* Shutdown the platform data for VRRP.
+
+   Parameters
+      IO struct lib_globals *lib_node   : Global variables
+
+   Results
+    RESULT_Ok on success, else the error which occurred.
+
+*/
+result_t pal_kernel_vrrp_stop (struct lib_globals *lib_node);
+
+/* Send the provided gratuitous ARP message out the specified interface.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO struct stream *s               : Gratuitous ARP message
+      IO struct interface *ifp          : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_gratuitous_arp_send (struct lib_globals *lib_node,
+                                         struct stream *ap,
+                                         struct interface *ifp);
+
+/*
+** Send the application provided complete VRRP advertisement packet over
+** specified interface.
+**
+** Parameters:
+**    IO struct lib_globals *lib_node   : Global variables
+**    IO struct stream *ap              : VRRP advert message
+**    IO struct interface *ifp          : Interface pointer
+**
+** Results:
+**    RESULT_OK for success, else error
+*/
+result_t
+pal_kernel_vrrp_advert_send (struct lib_globals *lib_node,
+                             struct stream *ap,
+                             struct interface *ifp,
+                             u_int8_t  af_type);
+
+/* A virtual IP address has been added to the specified interface.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO struct pal_in4_addr *vip       : Virtual IP address
+      IO struct interface *ifp          : Interface pointer
+      IO bool_t owner                   : Owner status of this address
+      IO u_int8_t vrid                  : VRRP Virutal Router ID
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_virtual_ipv4_add (struct lib_globals *lib_node,
+                                      struct pal_in4_addr *vip,
+                                      struct interface *ifp,
+                                      bool_t owner,
+                                      u_int8_t vrid);
+
+/* A virtual IP address has been deleted from the specified interface.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO struct pal_in4_addr *vip       : Virtual IP address
+      IO struct interface *ifp          : Interface pointer
+      IO bool_t owner                   : Owner status of this address
+      IO u_int8_t vrid                  : VRRP Virutal Router ID
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_virtual_ipv4_delete (struct lib_globals *lib_node,
+                                         struct pal_in4_addr *vip,
+                                         struct interface *ifp,
+                                         bool_t owner,
+                                         u_int8_t vrid);
+
+/* A virtual MAC address has been added to the specified interface.  This
+   Mac address is specified in RFC 2338 to be 00-00-5E-00-01-<VRID>.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO u_int8_t vrid                  : VRRP Virtual Router ID
+      IO struct interface *ifp          : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_virtual_mac_add (struct lib_globals *lib_node,
+                                     u_int8_t vrid,
+                                     struct interface *ifp, u_int8_t af_type);
+
+/* A virtual MAC address has been deleted from the specified interface.  This
+   Mac address is specified in RFC 2338 to be 00-00-5E-00-01-<VRID>.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO u_int8_t vrid                  : VRRP Virtual Router ID
+      IO struct interface *ifp          : Interface pointer
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_virtual_mac_delete (struct lib_globals *lib_node,
+                                        u_int8_t vrid,
+                                        struct interface *ifp,
+ 					u_int8_t af_type);
+/* Get the virtual MAC feature status.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+
+   Results:
+      PAL_TRUE if virtual mac feature is enabled, PAL_FALSE otherwise.
+*/
+result_t pal_kernel_get_vmac_status (struct lib_globals *lib_node);
+
+/* Set the virtual MAC feature status.
+
+   Parameters:
+      IO struct lib_globals *lib_node   : Global variables
+      IO int status                     : Status of VMAC feature.
+
+   Results:
+      RESULT_OK for success, else error.
+*/
+result_t pal_kernel_set_vmac_status (struct lib_globals *lib_node, int status);
+
+#endif /* HAVE_VRRP */
+
+/* This function is called to create a FIB in the forwarding plane for
+   the provided fib-id.
+
+   Parameters:
+      IO fib_id_t fib                   : ID for FIB to be created
+      IO bool_t new_vr                  : Flag to indicate if new VR is being created
+      IO char *fib_name                 : Name of the FIB
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_fib_create (fib_id_t fib, bool_t new_vr, char *fib_name);
+
+/* This function is called to delete a FIB in the forwarding plane for
+   the provided fib-id.
+
+   Parameters:
+      IO fib_id_t fib                   : ID for FIB to be deleted
+
+   Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_fib_delete (fib_id_t fib);
+
+/* This function is called to bind an interface to a VR in the dataplane.
+
+   Parameters:
+      IO struct interface *ifp          : Interface pointer.
+      IO fib_id_t fib_id                : VR context id.
+
+  Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_bind_vrf (struct interface *, fib_id_t);
+
+/* This function is called to unbind an interface from a VR in the dataplane.
+
+   Parameters:
+      IO struct interface *ifp          : Interface pointer.
+      IO fib_id_t fib_id                : VR context id.
+
+  Results:
+      RESULT_OK for success, else error
+*/
+result_t pal_kernel_if_unbind_vrf (struct interface *, fib_id_t);
+
+/*
+  Local variables:
+  mode: c
+  end:
+*/
+
+#endif /* _PAL_KERNEL_DEF */

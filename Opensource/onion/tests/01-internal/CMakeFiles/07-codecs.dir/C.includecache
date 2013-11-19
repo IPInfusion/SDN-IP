@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tests/01-internal/../ctest.h
+stdio.h
+-
+libgen.h
+-
+stdlib.h
+-
+string.h
+-
+exception
+-
+
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tests/01-internal/07-codecs.c
+malloc.h
+-
+string.h
+-
+unistd.h
+-
+onion/codecs.h
+-
+../ctest.h
+/home/tetsuya/work/ON.Lab/BGP_SDN_without_onion/BGP-SDN/opensource/onion/tests/01-internal/../ctest.h
+
+src/onion/codecs.h
+
