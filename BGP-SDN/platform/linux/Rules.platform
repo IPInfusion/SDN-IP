@@ -258,6 +258,6 @@ ALL_EXEI+= vtysh
 endif
 
 ifeq ($(ENABLE_BGP_SDN),yes)
-ARCH_CFLAGS+= -I$(TOP_DIR)/Opensource/onion/src
-EXTRA_LIBS+= $(TOP_DIR)/Opensource/onion/src/onion/libonion_static.a
+ARCH_CFLAGS+= -I$(TOP_DIR)/../Opensource/onion/src
+EXTRA_LIBS+= $(TOP_DIR)/../Opensource/onion/src/onion/libonion_static.a
 endif
