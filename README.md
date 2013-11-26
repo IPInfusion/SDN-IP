@@ -77,7 +77,7 @@ BGP supports the following REST APIs.
   ```
   
 ## License
-    To be filled
+    All contents of the BGP-SDN folder is licensed under AGPLv3. See AGPL.txt file for more details.
     
 ## Acknowledge
   HTTP Server library named as libonion which is licensed under LGPLv3 and AGPLv3 licenses is used for HTTP Server interface in BGP. 
