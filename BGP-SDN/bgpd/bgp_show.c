@@ -5196,6 +5196,10 @@ bgp_config_write_peer (struct cli *cli,
           cli_out (cli, " neighbor %s shutdown\n", addr);
 
       /* BGP port. */
+      if (peer->sock_remote_port != BGP_PORT_DEFAULT)
+        cli_out (cli, " neighbor %s remote-port %d\n",
+                 addr, peer->sock_remote_port);
+
       if (peer->sock_port != BGP_PORT_DEFAULT)
         cli_out (cli, " neighbor %s port %d\n",
                  addr, peer->sock_port);
