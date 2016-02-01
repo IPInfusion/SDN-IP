@@ -470,6 +470,11 @@ int
 peer_port_unset (struct bgp_peer *);
 
 int
+peer_remote_port_set (struct bgp_peer *, u_int16_t);
+int
+peer_remote_port_unset (struct bgp_peer *);
+
+int
 peer_weight_set (struct bgp_peer *, u_int16_t, afi_t, safi_t);
 int
 peer_weight_unset (struct bgp_peer *, afi_t, safi_t);

@@ -4712,6 +4712,42 @@ peer_port_set (struct bgp_peer *peer, u_int16_t port)
 }
 
 int
+peer_remote_port_set (struct bgp_peer *peer, u_int16_t port)
+{
+   struct bgp_peer *g_peer;
+   struct listnode *nn;
+
+   if (bgp_peer_group_active (peer))
+     return BGP_API_SET_ERR_INVALID_FOR_PEER_GROUP_MEMBER;
+  
+   peer->sock_remote_port = port;
+
+   if (CHECK_FLAG (peer->flags, PEER_FLAG_IN_GROUP))
+     {
+       if (peer->group)
+        g_peer = peer->group->conf;
+       else
+         return BGP_API_SET_ERR_PEER_GROUP_HAS_THE_FLAG;
+
+       /* peer-group member updates. */
+       if (g_peer == peer)
+         {
+           LIST_LOOP (peer->group->peer_list, peer, nn)
+             {
+                peer->sock_remote_port = port;
+                BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+             }
+         }
+       else
+         BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+     }
+   else
+     BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+ 
+  return 0;
+}
+
+int
 peer_port_unset (struct bgp_peer *peer)
 {
   struct bgp_peer *g_peer;
@@ -4732,6 +4768,39 @@ peer_port_unset (struct bgp_peer *peer)
           LIST_LOOP (peer->group->peer_list, peer, nn)
             {
               peer->sock_port = BGP_PORT_DEFAULT;
+              BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+            }
+        }
+      else
+        BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+    }
+  else
+    BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
+
+  return 0;
+}
+
+int
+peer_remote_port_unset (struct bgp_peer *peer)
+{
+  struct bgp_peer *g_peer;
+  struct listnode *nn;
+
+  peer->sock_remote_port = BGP_PORT_DEFAULT;
+
+  if (CHECK_FLAG (peer->flags, PEER_FLAG_IN_GROUP))
+    {
+      if (peer->group)
+        g_peer = peer->group->conf;
+      else
+        return BGP_API_SET_ERR_PEER_GROUP_HAS_THE_FLAG;
+
+      /* peer-group member updates. */
+      if (g_peer == peer)
+        {
+          LIST_LOOP (peer->group->peer_list, peer, nn)
+            {
+              peer->sock_remote_port = BGP_PORT_DEFAULT;
               BGP_PEER_FSM_EVENT_ADD (&BLG, peer, BPF_EVENT_MANUAL_RESET);
             }
         }

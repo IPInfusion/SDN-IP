@@ -3596,6 +3596,64 @@ ALI (no_neighbor_default_originate,
 
 /* Set neighbor's BGP port.  */
 int
+peer_remote_port_vty (struct cli *cli, char *ip_str, int afi, char *port_str)
+{
+  struct bgp_peer *peer;
+  u_int16_t port;
+  int ret;
+  struct pal_servent *sp;
+
+  peer = bgp_peer_and_group_lookup_vty (cli, ip_str);
+  if (! peer)
+    return CLI_ERROR;
+
+  if (! port_str)
+    {
+      sp = (struct pal_servent *) pal_getservbyname ("bgp", "tcp");
+      port = (sp == NULL)  ? BGP_PORT_DEFAULT : pal_ntoh16 (sp->s_port);
+    }
+  else
+    {
+      CLI_GET_INTEGER("port", port, port_str);
+    }
+
+  ret = peer_remote_port_set (peer, port);
+
+  return bgp_cli_return(cli,ret);
+}
+
+CLI (neighbor_remote_port,
+     neighbor_remote_port_cmd,
+     NEIGHBOR_CMD2 "remote-port <0-65535>",
+     CLI_NEIGHBOR_STR,
+     NEIGHBOR_ADDR_STR2,
+     "Neighbor's BGP port",
+     "TCP port number")
+{
+  return peer_remote_port_vty (cli, argv[0], AFI_IP, argv[1]);
+}
+
+CLI (no_neighbor_remote_port,
+     no_neighbor_remote_port_cmd,
+     NO_NEIGHBOR_CMD2 "remote-port",
+     CLI_NO_STR,
+     CLI_NEIGHBOR_STR,
+     NEIGHBOR_ADDR_STR2,
+     "Neighbor's BGP port")
+{
+  return peer_remote_port_vty (cli, argv[0], AFI_IP, NULL);
+}
+
+ALI (no_neighbor_remote_port,
+     no_neighbor_remote_port_val_cmd,
+     NO_NEIGHBOR_CMD2 "remote-port <0-65535>",
+     CLI_NO_STR,
+     CLI_NEIGHBOR_STR,
+     NEIGHBOR_ADDR_STR2,
+     "Neighbor's BGP port",
+     "TCP port number");
+
+int
 peer_port_vty (struct cli *cli, char *ip_str, int afi, char *port_str)
 {
   struct bgp_peer *peer;
@@ -5218,6 +5276,12 @@ bgp_cli_neighbor_init (struct cli_tree *ctree)
                    &no_neighbor_port_cmd);
   cli_install_gen (ctree, BGP_MODE, PRIVILEGE_NORMAL, 0,
                    &no_neighbor_port_val_cmd);
+  cli_install_gen (ctree, BGP_MODE, PRIVILEGE_NORMAL, 0,
+                   &neighbor_remote_port_cmd);
+  cli_install_gen (ctree, BGP_MODE, PRIVILEGE_NORMAL, 0,
+                   &no_neighbor_remote_port_cmd);
+  cli_install_gen (ctree, BGP_MODE, PRIVILEGE_NORMAL, 0,
+                   &no_neighbor_remote_port_val_cmd);
 
   /* "neighbor weight" commands. */
   cli_install_gen (ctree, BGP_MODE, PRIVILEGE_NORMAL, 0,

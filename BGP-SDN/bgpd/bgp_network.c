@@ -207,12 +207,18 @@ bpn_sock_cb_connect (struct bgp_peer *peer)
   switch (su.sa.sa_family)
     {
     case AF_INET:
-      su.sin.sin_port = pal_hton16 (BGP_PORT_DEFAULT);
+      if (peer->sock_remote_port != BGP_PORT_DEFAULT)
+	su.sin.sin_port = pal_hton16 (peer->sock_remote_port);
+      else
+        su.sin.sin_port = pal_hton16 (BGP_PORT_DEFAULT);
       break;
 
 #ifdef HAVE_IPV6
     case AF_INET6:
-      su.sin6.sin6_port  = pal_hton16 (BGP_PORT_DEFAULT);
+      if (peer->sock_remote_port != BGP_PORT_DEFAULT)
+	su.sin.sin_port = pal_hton16 (peer->sock_remote_port);
+      else
+        su.sin6.sin6_port  = pal_hton16 (BGP_PORT_DEFAULT);
 #ifdef KAME
       if (IN6_IS_ADDR_LINKLOCAL(&su.sin6.sin6_addr) && ifindex)
         {

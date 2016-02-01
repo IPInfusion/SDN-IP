@@ -1089,6 +1089,8 @@ struct bgp_peer
   /* BGP Peer Port Number */
   u_int16_t sock_port;
 
+  u_int16_t sock_remote_port;
+
   /* Peer information */
   u_int8_t *desc;               /* Description of the peer. */
   u_int8_t *host;               /* Printable address of the peer. */
@@ -2065,6 +2067,10 @@ int
 peer_port_set (struct bgp_peer *, u_int16_t);
 int
 peer_port_unset (struct bgp_peer *);
+int
+peer_remote_port_set (struct bgp_peer *, u_int16_t);
+int
+peer_remote_port_unset (struct bgp_peer *);
 int
 peer_weight_set (struct bgp_peer *, u_int16_t, afi_t, safi_t);
 int
